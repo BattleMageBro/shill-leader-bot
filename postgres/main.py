@@ -6,6 +6,7 @@ class Postgres():
         self.conn_string = conn_string
         self.conn = None
         self.db_table = db_table
+        self.primary = 'user_uuid'
 
     async def connect(self):
         while not self.conn:
@@ -19,7 +20,7 @@ class Postgres():
         return '123'
 
     async def get(self, id):
-        text = f"SELECT * FROM {self.db_table} WHERE chat_id={id}"
+        text = f"SELECT * FROM {self.db_table} WHERE {self.primary}={id}"
         print(text)
         res = await self.conn.fetch(text)
         print(res)
@@ -34,15 +35,15 @@ class Postgres():
             if type(item) == str:
                 item_str = f"'{item}'"
                 if not values:
-                    values = f"{item_str},"
+                    values = f"{item_str}"
                 else:
-                    values = f"{values} {item_str},"
+                    values = f"{values}, {item_str}"
             if type(item) == int:
                 item_int = f"{item}"
                 if not values:
-                    values = f"{item_int},"
+                    values = f"{item_int}"
                 else:
-                    values = f"{values} {item_int},"
+                    values = f"{values}, {item_int}"
         values = values[:-1]
         text = f"INSERT INTO {self.db_table} ({indexes}) VALUES ({values});"
         print(text)
@@ -50,6 +51,26 @@ class Postgres():
         print(res)
         return res
 
+    async def update(self, id, data):
+        values = ""
+        for key in data:
+            val = data[key]
+            if type(val) == str:
+                item = f"'{val}'"
+            elif type(val) == int:
+                item = f"{val}"
+            else:
+                item = f"{val}"
+            if not values:
+                values = f"{key} = {item}"
+            else:
+                values = f"{values}, {key} = {item}"
+        select_cond = f"{self.primary} = {id}"
+        text = f"UPDATE {self.db_table} SET {values} WHERE {select_cond};"
+        print(text)
+        res = await self.conn.fetch(text)
+        print(res)
+        return res
         
 
 
