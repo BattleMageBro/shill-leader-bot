@@ -6,7 +6,6 @@ class Postgres():
         self.conn_string = conn_string
         self.conn = None
         self.db_table = db_table
-        self.primary = 'user_uuid'
 
     async def connect(self):
         while not self.conn:
@@ -19,8 +18,12 @@ class Postgres():
                 await asyncio.sleep(10)
         return '123'
 
-    async def get(self, id):
-        text = f"SELECT * FROM {self.db_table} WHERE {self.primary}={id}"
+    async def get(self, index, id):
+        if type(id) == str:
+            id = f"'{id}'"
+        if type(id) == int:
+            id = f"{id}"
+        text = f"SELECT * FROM {self.db_table} WHERE {index}={id}"
         print(text)
         res = await self.conn.fetch(text)
         print(res)

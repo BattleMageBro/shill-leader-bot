@@ -3,6 +3,7 @@ from aiogram import executor
 import importlib
 
 importlib.import_module('handler.chat')
+importlib.import_module('handler.options')
 importlib.import_module('handler.shiller')
 
 

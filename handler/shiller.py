@@ -3,7 +3,7 @@ from core import dp, bot
 import os, time
 import datetime
 from messages import MESSAGES
-from states import TestStates
+from states import BotStates
 import asyncio
 from handler import utils
 
@@ -26,39 +26,39 @@ async def process_setstate_command(message: types.Message):
         await state.reset_state()
         return await message.reply(MESSAGES['stateReset'])
 
-    if (not argument.isdigit()) or (not int(argument) < len(TestStates.all())):
+    if (not argument.isdigit()) or (not int(argument) < len(BotStates.all())):
         return await message.reply(MESSAGES['invalidKey'].format(key=argument))
 
-    await state.set_state(TestStates.all()[int(argument)])
+    await state.set_state(BotStates.all()[int(argument)])
     await message.reply(MESSAGES['stateChange'], reply=False)
 
 
-@dp.message_handler(state=[None, TestStates.PENDING[0]], commands=['help'])
+@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'])
 async def help_case(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
     await message.answer(MESSAGES['help'])
 
-@dp.message_handler(state=[None, TestStates.PENDING[0]], commands=['start_shilling'])
+@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['start_shilling'])
 async def start_shilling(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
     end_time = datetime.datetime.now().timestamp() + 60
     state = dp.current_state(user=message.from_user.id)
-    await state.set_state(TestStates.START_SHILLING[0])
+    await state.set_state(BotStates.START_SHILLING[0])
     await message.answer(MESSAGES['startShilling'])
 
-@dp.message_handler(state=[TestStates.START_SHILLING[0]])
+@dp.message_handler(state=[BotStates.START_SHILLING[0]])
 async def start_shill(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
     print(message)
     SHILL_MESSAGE.append(message.text)
     state = dp.current_state(user=message.from_user.id)
-    await state.set_state(TestStates.SHILLING[0])
+    await state.set_state(BotStates.SHILLING[0])
     await message.answer(MESSAGES['shillOptsChoosen'])
 
-@dp.message_handler(state=[TestStates.SHILLING[0]], commands=['start'])
+@dp.message_handler(state=[BotStates.SHILLING[0]], commands=['start'])
 async def shilling(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
@@ -66,26 +66,22 @@ async def shilling(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     end_time = datetime.datetime.now().timestamp() + 20
     while datetime.datetime.now().timestamp() < end_time:
-        # dont work =(
-        # if dp.current_state(user=message.from_user.id) != 'shilling':
-        #     print('shill_process stoped from inner')
-        #     break
         for item in SHILL_MESSAGE:
             await bot.send_message(chat_id=message.chat.id, text=item)
             await asyncio.sleep(1)
         await asyncio.sleep(5)
-    await state.set_state(TestStates.PENDING[0])
+    await state.set_state(BotStates.PENDING[0])
     await message.answer(MESSAGES['shillEnds'])
 
 @utils.is_private
-@dp.message_handler(state=[None, TestStates.PENDING])
+@dp.message_handler(state=[None, BotStates.PENDING])
 async def first_test_state_case_met(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
     print(message)
     await message.reply('мы на самом старте!', reply=False)
 
-@dp.message_handler(state=TestStates.all())
+@dp.message_handler(state=BotStates.all())
 async def some_test_state_case_met(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
