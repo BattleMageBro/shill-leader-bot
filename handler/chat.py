@@ -3,8 +3,15 @@ from asyncpg import UniqueViolationError
 from core import dp, bot, postgres
 from handler.utils import is_group
 
+async def check_create_chat(chat_uuid):
+    chat = await postgres.get('chat', chat_uuid)
+    if not chat:
+        data = {'chat_uuid': chat_uuid}
+        await postgres.insert('chat', data)
+    return
+
 @dp.message_handler(state='*', commands='add_shillbot')
-async def add_new_chat(message: types.Message):
+async def create_user_chat(message: types.Message):
     print(message)
     if not is_group(message.chat.type):
         return
@@ -13,15 +20,17 @@ async def add_new_chat(message: types.Message):
         await message.reply('Only admins can add chats to shillbot')
     user_uuid = message.from_user.id
     chat_uuid = message.chat.id
+    await check_create_chat(chat_uuid)
     data = {"user_uuid": user_uuid, "chat_uuid": chat_uuid}
+    table = 'user_chat'
     try:
-        res = await postgres.insert(data)
+        await postgres.insert(table, data)
     except UniqueViolationError:
         err = "group is already added to your shill groups"
         await message.answer(err)
         return
     print("chat is successfully added to chats")
-    await message.reply("Тёмчик твой тест с добавлением бота успешен!)")
+    await message.reply("Chat is successfully added to chats!")
 
 @dp.message_handler(state=[None], commands='test2')
 async def test_handler(message: types.Message):

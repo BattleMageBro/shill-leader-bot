@@ -2,10 +2,9 @@ import asyncio
 import asyncpg
 
 class Postgres():
-    def __init__(self, conn_string, db_table):
+    def __init__(self, conn_string):
         self.conn_string = conn_string
         self.conn = None
-        self.db_table = db_table
 
     async def connect(self):
         while not self.conn:
@@ -18,12 +17,12 @@ class Postgres():
                 await asyncio.sleep(10)
         return '123'
 
-    async def get(self, index, id):
-        if type(id) == str:
-            id = f"'{id}'"
-        if type(id) == int:
-            id = f"{id}"
-        text = f"SELECT * FROM {self.db_table} WHERE {index}={id}"
+    async def get(self, table, index, value):
+        if type(value) == str:
+            value = f"'{value}'"
+        if type(value) == int:
+            value = f"{value}"
+        text = f"SELECT * FROM {table} WHERE {index}={value}"
         print(text)
         res = await self.conn.fetch(text)
         print(res)
@@ -31,7 +30,7 @@ class Postgres():
             raise Exception('no data in database')
         return res
 
-    async def insert(self, data):
+    async def insert(self, table, data):
         indexes = ', '.join(data)
         values = ""
         for item in data.values():
@@ -48,28 +47,28 @@ class Postgres():
                 else:
                     values = f"{values}, {item_int}"
         values = values[:-1]
-        text = f"INSERT INTO {self.db_table} ({indexes}) VALUES ({values});"
+        text = f"INSERT INTO {table} ({indexes}) VALUES ({values});"
         print(text)
         res = await self.conn.fetch(text)
         print(res)
         return res
 
-    async def update(self, id, data):
+    async def update(self, table, index, value, data):
         values = ""
         for key in data:
-            val = data[key]
-            if type(val) == str:
-                item = f"'{val}'"
-            elif type(val) == int:
-                item = f"{val}"
+            value = data[key]
+            if type(value) == str:
+                item = f"'{value}'"
+            elif type(value) == int:
+                item = f"{value}"
             else:
-                item = f"{val}"
+                item = f"{value}"
             if not values:
                 values = f"{key} = {item}"
             else:
                 values = f"{values}, {key} = {item}"
-        select_cond = f"{self.primary} = {id}"
-        text = f"UPDATE {self.db_table} SET {values} WHERE {select_cond};"
+        select_cond = f"{index} = {value}"
+        text = f"UPDATE {table} SET {values} WHERE {select_cond};"
         print(text)
         res = await self.conn.fetch(text)
         print(res)

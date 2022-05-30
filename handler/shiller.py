@@ -73,7 +73,6 @@ async def shilling(message: types.Message):
     await state.set_state(BotStates.PENDING[0])
     await message.answer(MESSAGES['shillEnds'])
 
-@utils.is_private
 @dp.message_handler(state=[None, BotStates.PENDING])
 async def first_test_state_case_met(message: types.Message):
     if not utils.is_private(message.chat.type):
