@@ -32,6 +32,8 @@ async def create_user_chat(message: types.Message):
     print("chat is successfully added to chats")
     await message.reply("Chat is successfully added to chats!")
 
+# --------------- for tests ---------------
+
 @dp.message_handler(state=[None], commands='test2')
 async def test_handler(message: types.Message):
     print(f'hey we have message {message}')
