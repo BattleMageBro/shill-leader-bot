@@ -14,7 +14,8 @@ bot = Bot(token=TOKEN, loop=loop)
 dp =  Dispatcher(bot, storage=MemoryStorage())
 
 SQL_CONN_STRING = f"postgresql://{config['SQL_HOST']}:{config['SQL_PORT']}/{config['SQL_DB']}?user={config['SQL_USER']}&password={config['SQL_PASSWORD']}"
-postgres = Postgres(SQL_CONN_STRING)
+POOL_SIZE = 10
+postgres = Postgres(SQL_CONN_STRING, POOL_SIZE)
 
 async def db_task():
     conn = await postgres.connect()

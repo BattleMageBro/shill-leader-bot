@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS chat (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-    user_uuid serial primary key
+    user_uuid serial primary key,
+    current_chat integer references chat (chat_uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_chat (

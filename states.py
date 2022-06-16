@@ -13,6 +13,7 @@ class BotStates(Helper):
     END_SHILLING = ListItem()
 
     #Add options for shilling
+    CHOOSE_CHAT = ListItem()
     CHOOSE_SHILL_MESSAGES = ListItem()
     CHOOSE_TIMEOUT = ListItem()
     CHOOSE_LINKS = ListItem()

@@ -8,6 +8,6 @@ MESSAGES = {
     'shillOptsChoosen': 'shilling options successfully choosen\nstart shilling\nfor shill_starting print /start',
     'shillEnds': 'We end with mthrfucker shilling',
     
-    'choose_options': 'Hey we choose opts',
+    'choose_options': 'Hey we start choosing opts',
     'choose_chat': 'Hey we choose chat'
 }
