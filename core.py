@@ -6,6 +6,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from postgres.main import Postgres
 from config import config
+from logg import logger
 
 loop = asyncio.get_event_loop()
 
@@ -17,11 +18,11 @@ SQL_CONN_STRING = f"postgresql://{config['SQL_HOST']}:{config['SQL_PORT']}/{conf
 POOL_SIZE = 10
 postgres = Postgres(SQL_CONN_STRING, POOL_SIZE)
 
-async def db_task():
-    conn = await postgres.connect()
-    print(f'qwe {conn}')
+async def postgres_task():
+    conn = await postgres.create_pool()
+    logger.info(f'qwe {conn}')
 
-loop.run_until_complete(db_task())
+loop.run_until_complete(postgres_task())
 
 async def shutdown(dispatcher: Dispatcher):
     """
