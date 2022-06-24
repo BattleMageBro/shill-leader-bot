@@ -10,5 +10,6 @@ MESSAGES = {
     
     'choose_options': 'This is process that helps you to choose options for group you want to shill',
     'choose_shill_message': 'At first you need to create shill message\nthis is short message that would prints every shill cycle\nChoose carefully',
-    'choose_chat': 'Hey we choose chat'
+    'choose_chat': 'Hey we choose chat',
+    'choose_links': 'Please type links separating with ","'
 }

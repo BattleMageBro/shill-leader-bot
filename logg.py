@@ -1,3 +1,4 @@
 from loguru import logger
 
-logger.add('out.log', backtrace=True, diagnose=True)
+log = logger
+log.add('out.log', backtrace=True, diagnose=True)

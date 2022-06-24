@@ -6,7 +6,7 @@ from messages import MESSAGES
 from states import BotStates
 import asyncio
 from handler import utils
-from logg import logger
+from logg import log
 
 SHILL_MESSAGE = ['3', '2', '1']
 
@@ -17,7 +17,7 @@ SHILL_MESSAGE = ['3', '2', '1']
 async def test_handler(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
-    logger.debug(f'hey we have message {message}')
+    log.debug(f'hey we have message {message}')
     await message.reply("Тёмчик твой тест успешен!)")
 
 # ------------------------ end for tests -----------------------------
@@ -58,7 +58,7 @@ async def start_shilling(message: types.Message):
 async def start_shill(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
-    logger.debug(message)
+    log.debug(message)
     SHILL_MESSAGE.append(message.text)
     state = dp.current_state(user=message.from_user.id)
     await state.set_state(BotStates.SHILLING[0])
@@ -68,7 +68,7 @@ async def start_shill(message: types.Message):
 async def shilling(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
-    logger.debug(message)
+    log.debug(message)
     state = dp.current_state(user=message.from_user.id)
     end_time = datetime.datetime.now().timestamp() + 20
     while datetime.datetime.now().timestamp() < end_time:
@@ -83,7 +83,7 @@ async def shilling(message: types.Message):
 async def first_test_state_case_met(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
-    logger.debug(message)
+    log.debug(message)
     await message.reply('мы на самом старте!', reply=False)
 
 @dp.message_handler(state=BotStates.all())
