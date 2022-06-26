@@ -4,6 +4,7 @@ import importlib
 
 from logg import log
 
+importlib.import_module('handler.user')
 importlib.import_module('handler.chat')
 importlib.import_module('handler.options')
 importlib.import_module('handler.shiller')

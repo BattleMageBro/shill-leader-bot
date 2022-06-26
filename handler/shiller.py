@@ -38,6 +38,15 @@ async def process_setstate_command(message: types.Message):
     await state.set_state(BotStates.all()[int(argument)])
     await message.reply(MESSAGES['stateChange'], reply=False)
 
+@dp.message_handler(state='*', commands=['getstate'])
+async def process_setstate_command(message: types.Message):
+    if not utils.is_private(message.chat.type):
+        return
+    state = dp.current_state(user=message.from_user.id)
+
+    await message.reply(f'Current state is {await state.get_state()}')
+
+
 
 @dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'])
 async def help_case(message: types.Message):

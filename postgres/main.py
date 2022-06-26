@@ -32,8 +32,6 @@ class Postgres():
             logger.debug(text)
             res = await conn.fetch(text)
             logger.debug(res)
-            if not res:
-                raise Exception('no data in database')
             return res
 
     async def insert(self, table, data):
