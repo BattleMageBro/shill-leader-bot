@@ -1,3 +1,6 @@
+from logg import log
+
+
 class ServiceError(Exception):
     def __init__(self, **kwargs):
         self.user_message = kwargs.get('user_message')
@@ -16,6 +19,6 @@ class UserError(ServiceError):
 
 
 def to_custom_exc(exc:Exception, user_id:str):
-    if type(exc) != ServiceError:
+    if not isinstance(exc, ServiceError):
         exc = ErrorToCustom(exc, user=user_id)
     return exc

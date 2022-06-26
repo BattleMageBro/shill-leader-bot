@@ -1,7 +1,5 @@
 from aiogram import types
-from core import dp, bot, postgres
-from states import BotStates
-from handler.utils import is_private
+from core import dp
 from messages import MESSAGES
 from logg import log
 from exceptions import UserError, to_custom_exc
