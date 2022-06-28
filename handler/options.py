@@ -9,11 +9,6 @@ from exceptions import to_custom_exc
 from postgres.handlers import user_handler, chat_handler
 
 
-@dp.message_handler(state=[BotStates.CHOOSE_CHAT[0]])
-async def choose_chat(message:types.Message):
-    await message.answer(MESSAGES['choose_chat'])
-    await message.answer(MESSAGES['choose_options'])
-
 async def shill_message(message:types.Message):
     user_uuid = message.from_user.id
     user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)

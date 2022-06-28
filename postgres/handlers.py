@@ -4,12 +4,13 @@ from logg import log
 
 
 class UserHandler():
+    def __init__(self):
+        self.table_name = 'users'
 
     async def get(self, user_uuid):
-        table_name = 'users'
         index_name = 'user_uuid'
-        user = await postgres.select(table_name, index_name, user_uuid)
-        if type(user) == list:
+        user = await postgres.select(self.table_name, index_name, user_uuid)
+        if type(user) == list and len(user) != 0:
             user = user[0]
         else:
             user_message = ('Sorry user with your\'s id {} doesn\'t exist in our database.'
@@ -29,22 +30,21 @@ class UserHandler():
         return user, chat_id
 
     async def patch(self, user_uuid, data):
-        table_name = 'users'
         index_name = 'user_uuid'
-        await postgres.update(table_name, index_name, user_uuid, data)
+        await postgres.update(self.table_name, index_name, user_uuid, data)
 
     async def post(self, data):
-        table_name = 'users'
-        await postgres.insert(table_name, data)
+        await postgres.insert(self.table_name, data)
 
 
 class ChatHandler():
+    def __init__(self):
+        self.table_name = 'chat'
 
     async def get(self, chat_uuid):
-        table_name = 'chat'
         index_name = 'chat_uuid'
-        chat = await postgres.select(table_name, index_name, chat_uuid)
-        if type(chat) == list:
+        chat = await postgres.select(self.table_name, index_name, chat_uuid)
+        if type(chat) == list and len(chat) != 0:
             chat = chat[0]
         else:
             chat = None
@@ -52,14 +52,39 @@ class ChatHandler():
         return chat
     
     async def patch(self, chat_uuid, data):
-        table_name = 'chat'
         index_name = 'chat_uuid'
-        await postgres.update(table_name, index_name, chat_uuid, data)
+        await postgres.update(self.table_name, index_name, chat_uuid, data)
 
     async def post(self, data):
-        table_name = 'chat'
-        await postgres.insert(table_name, data)
+        await postgres.insert(self.table_name, data)
+
+
+class UserChatHandler():
+    def __init__(self):
+        self.table_name = 'user_chat'
+
+    async def get_chats_by_user(self, user_uuid):
+        index_name = 'user_uuid'
+        chats = await postgres.select(self.table_name, index_name, user_uuid)
+        if type(chats) != list:
+            chats = []
+        return chats
+
+    async def get_users_by_chat(self, chat_uuid):
+        index_name = 'chat_uuid'
+        users = await postgres.select(self.table_name, index_name, chat_uuid)
+        if type(users) != list:
+            users = []
+        return users
+
+    async def post(self, data):
+        await postgres.insert(self.table_name, data)
+
+    async def have_link(self, user_uuid, chat_uuid):
+        pass
+        #links = await postgres.select()
 
 
 user_handler = UserHandler()
 chat_handler = ChatHandler()
+user_chat_handler = UserChatHandler()
