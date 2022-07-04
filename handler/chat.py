@@ -20,17 +20,28 @@ async def check_create_chat(chat_uuid):
 @dp.message_handler(state='*', commands=['choose_chat'])
 async def choose_chat_start(message:types.Message):
     user_uuid = message.from_user.id
+    chats = await user_chat_handler.get_chats_by_user(user_uuid)
     state = dp.current_state(user=user_uuid)
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    for item in chats:
+        keyboard.add(str(item['chat_uuid']))
     await state.set_state(BotStates.CHOOSE_CHAT[0])
-    await message.answer(MESSAGES['choose_chat'])
+    await message.answer(MESSAGES['choose_chat'], reply_markup=keyboard)
 
 @dp.message_handler(state=[BotStates.CHOOSE_CHAT[0]])
 async def choose_chat(message:types.Message):
+    user_uuid = message.from_user.id
+    try:
+        await user_handler.patch(user_uuid, {'current_chat': message.text})
+    except Exception as exc:
+        exc = to_custom_exc(exc, message.from_user.id)
+        log.error(exc.dev_message)
+        await message.answer(exc.user_message)
+        return
     state = dp.current_state(user=user_uuid)
     await message.answer(MESSAGES['choose_chat'])
     await message.answer(MESSAGES['choose_options'])
     await state.set_state(BotStates.PENDING[0])
-    
 
 @dp.message_handler(state='*', commands=['add_shillbot'])
 async def create_user_chat(message: types.Message):
@@ -43,12 +54,11 @@ async def create_user_chat(message: types.Message):
         user_uuid = message.from_user.id
         chat_uuid = message.chat.id
         await check_create_chat(chat_uuid)
-        have_link = await check_user_chat_link(user_uuid, chat_uuid)
-        if not have_link:
+        if not await user_chat_handler.have_link(user_uuid, chat_uuid):
             data = {"user_uuid": user_uuid, "chat_uuid": chat_uuid}
             await user_chat_handler.post(data)
+            log.info("User with id {} successfully added chat with id {} to chats".format(user_uuid, chat_uuid))
 
-        log.info("User with id {} successfully added chat with id {} to chats".format(user_uuid, chat_uuid))
         await message.reply(MESSAGES['chat_added'])
     except Exception as exc:
         exc = to_custom_exc(exc, message.from_user.id)
@@ -61,10 +71,6 @@ async def create_user_chat(message: types.Message):
 
 @dp.message_handler(state=[None], commands='test2')
 async def test_handler(message: types.Message):
-    print(f'hey we have message {message}')
-    member = await message.chat.get_member(message.from_user.id)
-    print(member)
-    if not member.is_chat_admin():
-        await message.reply('А ты не админ!) я тёмчика сразу узнаю')
-        return
-    await message.reply("Тёмчик твой тест2 успешен!)")
+    user = await user_handler.get(message.from_user.id)
+    log.debug(user['user_uuid'])
+    log.debug(user['current_chat'])

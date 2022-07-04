@@ -8,8 +8,8 @@ class UserHandler():
         self.table_name = 'users'
 
     async def get(self, user_uuid):
-        index_name = 'user_uuid'
-        user = await postgres.select(self.table_name, index_name, user_uuid)
+        select_condintions = {'user_uuid': user_uuid}
+        user = await postgres.select(self.table_name, select_condintions)
         if type(user) == list and len(user) != 0:
             user = user[0]
         else:
@@ -42,8 +42,8 @@ class ChatHandler():
         self.table_name = 'chat'
 
     async def get(self, chat_uuid):
-        index_name = 'chat_uuid'
-        chat = await postgres.select(self.table_name, index_name, chat_uuid)
+        select_condintions = {'chat_uuid': chat_uuid}
+        chat = await postgres.select(self.table_name, select_condintions)
         if type(chat) == list and len(chat) != 0:
             chat = chat[0]
         else:
@@ -64,15 +64,15 @@ class UserChatHandler():
         self.table_name = 'user_chat'
 
     async def get_chats_by_user(self, user_uuid):
-        index_name = 'user_uuid'
-        chats = await postgres.select(self.table_name, index_name, user_uuid)
+        select_condintions = {'user_uuid': user_uuid}
+        chats = await postgres.select(self.table_name, select_condintions)
         if type(chats) != list:
             chats = []
         return chats
 
     async def get_users_by_chat(self, chat_uuid):
-        index_name = 'chat_uuid'
-        users = await postgres.select(self.table_name, index_name, chat_uuid)
+        select_condintions = {'chat_uuid': chat_uuid}
+        users = await postgres.select(self.table_name, select_condintions)
         if type(users) != list:
             users = []
         return users
@@ -81,8 +81,11 @@ class UserChatHandler():
         await postgres.insert(self.table_name, data)
 
     async def have_link(self, user_uuid, chat_uuid):
-        pass
-        #links = await postgres.select()
+        select_conditions = {'chat_uuid': chat_uuid, 'user_uuid': user_uuid}
+        links = await postgres.select(self.table_name, select_conditions)
+        if links:
+            return True
+        return False
 
 
 user_handler = UserHandler()

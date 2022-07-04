@@ -1,7 +1,7 @@
 import asyncio
 import asyncpg
 
-from logg import logger
+from logg import log
 
 class Postgres():
     def __init__(self, conn_string, pool_size):
@@ -12,11 +12,11 @@ class Postgres():
     async def create_pool(self):
         while not self.pool:
             try:
-                logger.debug(self.conn_string)
+                log.debug(self.conn_string)
                 self.pool = await asyncpg.create_pool(dsn=self.conn_string, command_timeout=60, max_size=self.pool_size)
-                logger.info('postgres.create_pool succesfully')
+                log.info('postgres.create_pool succesfully')
             except Exception as exc:
-                logger.error(f'postgres.create_pool catch exception when connect: {exc}')
+                log.error(f'postgres.create_pool catch exception when connect: {exc}')
                 await asyncio.sleep(10)
         return f'successfully created pool: {self.pool}'
 
@@ -30,9 +30,9 @@ class Postgres():
     #         if type(value) == int:
     #             value = f"{value}"
     #         text = f"SELECT * FROM {table} WHERE {index}={value}"
-    #         logger.debug(text)
+    #         log.debug(text)
     #         res = await conn.fetch(text)
-    #         logger.debug(res)
+    #         log.debug(res)
     #         return res
 
     async def select(self, table, select_cond):
@@ -41,13 +41,14 @@ class Postgres():
         async with self.pool.acquire() as conn:
             search_string = ''
             for item in select_cond:
-                if type(select_cond['item']) == str:
-                    select_cond['item'] = f"'{select_cond['item']}'"
-                search_string = f'{search_string} AND {item}={select_cond[item]}'.strip(' AND')
+                if type(select_cond[item]) == str:
+                    select_cond[item] = f"'{select_cond[item]}'"
+                search_string = f'{search_string} AND {item}={select_cond[item]}'.lstrip(' AND')
             text = f"SELECT * FROM {table} WHERE {search_string}"
-            logger.debug(text)
+            text = text.rstrip(' WHERE ')
+            log.debug(text)
             res = await conn.fetch(text)
-            logger.debug(res)
+            log.debug(res)
             return res
 
     async def insert(self, table, data):
@@ -70,9 +71,9 @@ class Postgres():
                     else:
                         values = f"{values}, {item_int}"
             text = f"INSERT INTO {table} ({indexes}) VALUES ({values});"
-            logger.debug(text)
+            log.debug(text)
             res = await conn.fetch(text)
-            logger.debug(res)
+            log.debug(res)
             return res
 
     async def update(self, table, index, select_index, data):
@@ -94,9 +95,9 @@ class Postgres():
                     values = f"{values}, {key} = {item}"
             select_cond = f"{index} = {select_index}"
             text = f"UPDATE {table} SET {values} WHERE {select_cond};"
-            logger.debug(text)
+            log.debug(text)
             res = await conn.fetch(text)
-            logger.debug(res)
+            log.debug(res)
             return res
         
 

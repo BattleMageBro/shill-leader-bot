@@ -24,8 +24,7 @@ async def get_chat_options(message:types.Message):
     try:
         user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
         chat = await chat_handler.get(chat_uuid)
-        result = json.dumps(chat)
-        await message.answer(result)
+        await message.answer(chat)
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)
