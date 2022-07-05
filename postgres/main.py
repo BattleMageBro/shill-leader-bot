@@ -87,6 +87,8 @@ class Postgres():
                     item = f"'{value}'"
                 elif type(value) == int:
                     item = f"{value}"
+                elif type(value) == list:
+                    item = f"ARRAY{value}"
                 else:
                     item = f"{value}"
                 if not values:

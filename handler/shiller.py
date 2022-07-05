@@ -7,86 +7,57 @@ from states import BotStates
 import asyncio
 from handler import utils
 from logg import log
+from exceptions import UserError, to_custom_exc
+from postgres.handlers import user_handler, chat_handler
 
-SHILL_MESSAGE = ['3', '2', '1']
 
+current_transitions = []
 
-# ------------------------ for tests -----------------------------
-
-@dp.message_handler(state=[None], commands='test1')
-async def test_handler(message: types.Message):
+@dp.message_handler(state='*', commands=['shill_start'])
+async def shill_start(message: types.Message):
     if not utils.is_private(message.chat.type):
         return
-    log.debug(f'hey we have message {message}')
-    await message.reply("Тёмчик твой тест успешен!)")
+    # ToDo создать спейс транзишенов в постгре и записывать туда все а не в оперативку
+    user_uuid = message.from_user.id
+    try:
+        if user_uuid in current_transitions:
+            raise UserError(
+                user_message='You already shilling. End shill with /end_shill command, choose other chat and options if needed and start again',
+                dev_message='Double shilling by user {}'.format(user_uuid)
+            )
+        current_transitions.append(user_uuid)
+        user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+        chat = await chat_handler.get(chat_uuid)
+        end_time = datetime.datetime.now().timestamp() + 59 # ToDo create config parameter
+        shill_messages = ['3', '2', '1'].append(chat['shill_message'])
+        msg_timeout, shill_timeout = chat['msg_timeout'], chat['shill_timeout']
+        while datetime.datetime.now().timestamp() < end_time and user_uuid in current_transitions:
+            for link in chat['shill_links']:
+                msg = f'{link}  -  {chat["shill_message"]}'
+                shill_messages = ['3', '2', '1']
+                shill_messages.append(msg)
+                for item in shill_messages:
+                    await bot.send_message(chat_id=chat_uuid, text=item)
+                    await asyncio.sleep(msg_timeout)
+                await asyncio.sleep(shill_timeout)
+                if user_uuid not in current_transitions:
+                    break
+        if user_uuid in current_transitions:
+            current_transitions.remove(user_uuid)
+    except Exception as exc:
+        exc = to_custom_exc(exc, user_uuid)
+        log.error(exc.dev_message)
+        await message.answer(exc.user_message)
+        current_transitions.remove(user_uuid)
+        return
 
-# ------------------------ end for tests -----------------------------
-
-@dp.message_handler(state='*', commands=['setstate'])
-async def process_setstate_command(message: types.Message):
+@dp.message_handler(state='*', commands=['shill_stop'])
+async def shill_stop(message:types.Message):
     if not utils.is_private(message.chat.type):
         return
-    argument = message.get_args()
-    state = dp.current_state(user=message.from_user.id)
-    if not argument:
-        await state.reset_state()
-        return await message.reply(MESSAGES['stateReset'])
-
-    if (not argument.isdigit()) or (not int(argument) < len(BotStates.all())):
-        return await message.reply(MESSAGES['invalidKey'].format(key=argument))
-
-    await state.set_state(BotStates.all()[int(argument)])
-    await message.reply(MESSAGES['stateChange'], reply=False)
-
-@dp.message_handler(state='*', commands=['getstate'])
-async def process_setstate_command(message: types.Message):
-    if not utils.is_private(message.chat.type):
-        return
-    state = dp.current_state(user=message.from_user.id)
-
-    await message.reply(f'Current state is {await state.get_state()}')
-
-
-
-@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'])
-async def help_case(message: types.Message):
-    if not utils.is_private(message.chat.type):
-        return
-    await message.answer(MESSAGES['help'])
-
-@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['start_shilling'])
-async def start_shilling(message: types.Message):
-    if not utils.is_private(message.chat.type):
-        return
-    end_time = datetime.datetime.now().timestamp() + 60
-    state = dp.current_state(user=message.from_user.id)
-    await state.set_state(BotStates.START_SHILLING[0])
-    await message.answer(MESSAGES['startShilling'])
-
-@dp.message_handler(state=[BotStates.START_SHILLING[0]])
-async def start_shill(message: types.Message):
-    if not utils.is_private(message.chat.type):
-        return
-    log.debug(message)
-    SHILL_MESSAGE.append(message.text)
-    state = dp.current_state(user=message.from_user.id)
-    await state.set_state(BotStates.SHILLING[0])
-    await message.answer(MESSAGES['shillOptsChoosen'])
-
-@dp.message_handler(state=[BotStates.SHILLING[0]], commands=['start'])
-async def shilling(message: types.Message):
-    if not utils.is_private(message.chat.type):
-        return
-    log.debug(message)
-    state = dp.current_state(user=message.from_user.id)
-    end_time = datetime.datetime.now().timestamp() + 20
-    while datetime.datetime.now().timestamp() < end_time:
-        for item in SHILL_MESSAGE:
-            await bot.send_message(chat_id=message.chat.id, text=item)
-            await asyncio.sleep(1)
-        await asyncio.sleep(5)
-    await state.set_state(BotStates.PENDING[0])
-    await message.answer(MESSAGES['shillEnds'])
+    # ToDo создать спейс транзишенов в постгре и записывать туда все а не в оперативку
+    if message.from_user.id in current_transitions:
+        current_transitions.remove(message.from_user.id)
 
 @dp.message_handler(state=[None, BotStates.PENDING])
 async def first_test_state_case_met(message: types.Message):

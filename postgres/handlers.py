@@ -48,7 +48,6 @@ class ChatHandler():
             chat = chat[0]
         else:
             chat = None
-        log.debug(chat)
         return chat
     
     async def patch(self, chat_uuid, data):

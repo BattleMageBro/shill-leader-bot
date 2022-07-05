@@ -8,6 +8,7 @@ importlib.import_module('handler.user')
 importlib.import_module('handler.chat')
 importlib.import_module('handler.options')
 importlib.import_module('handler.shiller')
+importlib.import_module('handler.utils')
 
 
 if __name__ == '__main__':

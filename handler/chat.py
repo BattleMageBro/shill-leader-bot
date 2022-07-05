@@ -31,6 +31,7 @@ async def choose_chat_start(message:types.Message):
 @dp.message_handler(state=[BotStates.CHOOSE_CHAT[0]])
 async def choose_chat(message:types.Message):
     user_uuid = message.from_user.id
+    state = dp.current_state(user=user_uuid)
     try:
         await user_handler.patch(user_uuid, {'current_chat': message.text})
     except Exception as exc:
@@ -38,10 +39,10 @@ async def choose_chat(message:types.Message):
         log.error(exc.dev_message)
         await message.answer(exc.user_message)
         return
-    state = dp.current_state(user=user_uuid)
+    finally:
+        await state.set_state(BotStates.PENDING[0])
     await message.answer(MESSAGES['choose_chat'])
-    await message.answer(MESSAGES['choose_options'])
-    await state.set_state(BotStates.PENDING[0])
+    
 
 @dp.message_handler(state='*', commands=['add_shillbot'])
 async def create_user_chat(message: types.Message):
@@ -55,8 +56,8 @@ async def create_user_chat(message: types.Message):
         chat_uuid = message.chat.id
         await check_create_chat(chat_uuid)
         if not await user_chat_handler.have_link(user_uuid, chat_uuid):
-            data = {"user_uuid": user_uuid, "chat_uuid": chat_uuid}
-            await user_chat_handler.post(data)
+            await user_chat_handler.post({"user_uuid": user_uuid, "chat_uuid": chat_uuid})
+            await user_handler.patch(user_uuid, {'current_chat': chat_uuid})
             log.info("User with id {} successfully added chat with id {} to chats".format(user_uuid, chat_uuid))
 
         await message.reply(MESSAGES['chat_added'])

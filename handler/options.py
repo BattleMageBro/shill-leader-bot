@@ -16,7 +16,7 @@ async def shill_message(message:types.Message):
     shill_message = message.text
     data = {'shill_message': shill_message}
     await chat_handler.patch(chat_uuid, data)
-    await message.answer(MESSAGES['choose_shill_message_success'])
+    await message.answer(MESSAGES['choose_shill_message_success'].format(shill_message))
 
 @dp.message_handler(state='*', commands=['get_chat_info'])
 async def get_chat_options(message:types.Message):
@@ -46,9 +46,6 @@ async def start_choosing_options(message:types.Message):
         await state.set_state(BotStates.PENDING[0])
         await message.answer(exc.user_message)
         return
-    #next step is choose shill message 
-    #then links
-    #then timeout   
     # ToDo : add packs
 
 @dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0]])
@@ -87,14 +84,31 @@ async def choose_links_opts(message:types.Message):
     try:
         user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
 
-        links = message.text.strip(' ').split(',')
-        data = {'links': links}
+        links = message.text.replace(' ', '').split(',')
+        data = {'shill_links': links}
         await chat_handler.patch(chat_uuid, data)
         await message.answer(MESSAGES['choose_links_success'])
 
         
         await state.set_state(BotStates.CHOOSE_TIMEOUT[0])
         await message.answer(MESSAGES['choose_timeout'])
+    except Exception as exc:
+        exc = to_custom_exc(exc, user_uuid)
+        log.error(exc.dev_message)
+        await state.set_state(BotStates.PENDING[0])
+        await message.answer(exc.user_message)
+        return
+
+@dp.message_handler(state=[BotStates.CHOOSE_TIMEOUT[0]])
+async def choose_timeout(message:types.Message):
+    user_uuid = message.from_user.id
+    state = dp.current_state(user=user_uuid)
+    try:
+        user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+        data = {'shill_timeout': int(message.text)}
+        await chat_handler.patch(chat_uuid, data)
+        await state.set_state(BotStates.PENDING[0])
+        await message.answer(MESSAGES['choose_timeout_success'].format(int(message.text)))
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)

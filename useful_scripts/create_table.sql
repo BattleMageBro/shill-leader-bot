@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS chat (
     chat_uuid serial primary key,
+    chat_name varchar(512),
     shill_message text,
     shill_links varchar(255)[],
     shill_timeout integer default 60,
