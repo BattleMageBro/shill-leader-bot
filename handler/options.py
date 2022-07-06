@@ -9,17 +9,12 @@ from exceptions import to_custom_exc
 from postgres.handlers import user_handler, chat_handler
 
 
-async def shill_message(message:types.Message):
-    user_uuid = message.from_user.id
-    _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
-
-    shill_message = message.text
-    data = {'shill_message': shill_message}
-    await chat_handler.patch(chat_uuid, data)
-    await message.answer(MESSAGES['choose_shill_message_success'].format(shill_message))
-
 @dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['choose_options'], chat_type=types.ChatType.PRIVATE)
 async def start_choosing_options(message:types.Message):
+    #toDo перепилить блок чтобы тут было на выбор выподали ключи как в чатах, паки или самостоятельно . И в состояние ЧУЗ_ПАК_ОР_СЕЛФ
+    #toDO далее по проуессам идем в выбор шил сообщения потом тамер, добавить таймер в бд на выключения шилпроцесса
+    #toDo надо зафигачить нейм в чатах и иннер джойн на присоединение их из другой таблички
+    #toDo еще надо добавить комманды для помощи хелп коммандс и тд
     user_uuid = message.from_user.id
     state = dp.current_state(user=user_uuid)
     try:
@@ -34,6 +29,17 @@ async def start_choosing_options(message:types.Message):
         await message.answer(exc.user_message)
         return
     # ToDo : add packs
+
+
+
+async def shill_message(message:types.Message):
+    user_uuid = message.from_user.id
+    _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+
+    shill_message = message.text
+    data = {'shill_message': shill_message}
+    await chat_handler.patch(chat_uuid, data)
+    await message.answer(MESSAGES['choose_shill_message_success'].format(shill_message))
 
 @dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0]], chat_type=types.ChatType.PRIVATE)
 async def choose_shill_message_opts(message:types.Message):

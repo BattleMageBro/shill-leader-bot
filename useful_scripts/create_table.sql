@@ -16,3 +16,9 @@ CREATE TABLE IF NOT EXISTS user_chat (
     chat_uuid integer references chat (chat_uuid) ON DELETE CASCADE,
     user_uuid integer references users (user_uuid) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS packs (
+    pack_uuid serial primary key,
+    pack_desctiption text
+    shill_links varchar(255)[],
+);references
