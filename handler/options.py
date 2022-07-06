@@ -18,7 +18,7 @@ async def shill_message(message:types.Message):
     await chat_handler.patch(chat_uuid, data)
     await message.answer(MESSAGES['choose_shill_message_success'].format(shill_message))
 
-@dp.message_handler(state='*', commands=['get_chat_info'])
+@dp.message_handler(state='*', commands=['get_chat_info'], chat_type=types.ChatType.PRIVATE)
 async def get_chat_options(message:types.Message):
     user_uuid = message.from_user.id
     try:
@@ -31,7 +31,7 @@ async def get_chat_options(message:types.Message):
         await message.answer(exc.user_message)
         return
 
-@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['choose_options'])
+@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['choose_options'], chat_type=types.ChatType.PRIVATE)
 async def start_choosing_options(message:types.Message):
     user_uuid = message.from_user.id
     state = dp.current_state(user=user_uuid)
@@ -48,7 +48,7 @@ async def start_choosing_options(message:types.Message):
         return
     # ToDo : add packs
 
-@dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0]])
+@dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0]], chat_type=types.ChatType.PRIVATE)
 async def choose_shill_message_opts(message:types.Message):
     state = dp.current_state(user=message.from_user.id)
     try:
@@ -63,7 +63,7 @@ async def choose_shill_message_opts(message:types.Message):
         await message.answer(exc.user_message)
         return
 
-@dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE[0]])
+@dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE[0]], chat_type=types.ChatType.PRIVATE)
 async def choose_shill_message(message:types.Message):
     state = dp.current_state(user=message.from_user.id)
     try:
@@ -77,7 +77,7 @@ async def choose_shill_message(message:types.Message):
         await message.answer(exc.user_message)
         return
 
-@dp.message_handler(state=[BotStates.CHOOSE_LINKS_OPTS[0]])
+@dp.message_handler(state=[BotStates.CHOOSE_LINKS_OPTS[0]], chat_type=types.ChatType.PRIVATE)
 async def choose_links_opts(message:types.Message):
     user_uuid = message.from_user.id
     state = dp.current_state(user=user_uuid)
@@ -99,7 +99,7 @@ async def choose_links_opts(message:types.Message):
         await message.answer(exc.user_message)
         return
 
-@dp.message_handler(state=[BotStates.CHOOSE_TIMEOUT[0]])
+@dp.message_handler(state=[BotStates.CHOOSE_TIMEOUT[0]], chat_type=types.ChatType.PRIVATE)
 async def choose_timeout(message:types.Message):
     user_uuid = message.from_user.id
     state = dp.current_state(user=user_uuid)

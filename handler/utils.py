@@ -6,20 +6,8 @@ from messages import MESSAGES
 from states import BotStates
 
 
-def is_private(mes_type):
-    if mes_type == 'private':
-        return True
-    return False
-
-def is_group(mes_type):
-    if mes_type == 'group':
-        return True
-    return False
-
-@dp.message_handler(state='*', commands=['setstate'])
+@dp.message_handler(state='*', commands=['setstate'], chat_type=types.ChatType.PRIVATE)
 async def process_setstate_command(message: types.Message):
-    if not is_private(message.chat.type):
-        return
     argument = message.get_args()
     state = dp.current_state(user=message.from_user.id)
     if not argument:
@@ -32,18 +20,14 @@ async def process_setstate_command(message: types.Message):
     await state.set_state(BotStates.all()[int(argument)])
     await message.reply(MESSAGES['stateChange'], reply=False)
 
-@dp.message_handler(state='*', commands=['getstate'])
+@dp.message_handler(state='*', commands=['getstate'], chat_type=types.ChatType.PRIVATE)
 async def process_setstate_command(message: types.Message):
-    if not is_private(message.chat.type):
-        return
     state = dp.current_state(user=message.from_user.id)
 
     await message.reply(f'Current state is {await state.get_state()}')
 
-@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'])
+@dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'], chat_type=types.ChatType.PRIVATE)
 async def help_case(message: types.Message):
-    if not is_private(message.chat.type):
-        return
     await message.answer(MESSAGES['help'])
 
 

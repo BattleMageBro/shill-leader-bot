@@ -6,7 +6,7 @@ from exceptions import UserError, to_custom_exc
 from postgres.handlers import user_handler, chat_handler
 
 
-@dp.message_handler(state='*', commands=['start'])
+@dp.message_handler(state='*', commands=['start'], chat_type=types.ChatType.PRIVATE)
 async def create_user_on_start(message:types.Message):
     user_uuid = message.from_user.id
     try:
