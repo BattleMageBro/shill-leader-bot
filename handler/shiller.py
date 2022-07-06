@@ -24,7 +24,7 @@ async def shill_start(message: types.Message):
                 dev_message='Double shilling by user {}'.format(user_uuid)
             )
         current_transitions.append(user_uuid)
-        user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+        _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
         chat = await chat_handler.get(chat_uuid)
         end_time = datetime.datetime.now().timestamp() + 59 # ToDo create config parameter
         shill_messages = ['3', '2', '1'].append(chat['shill_message'])

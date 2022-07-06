@@ -29,14 +29,3 @@ async def process_setstate_command(message: types.Message):
 @dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'], chat_type=types.ChatType.PRIVATE)
 async def help_case(message: types.Message):
     await message.answer(MESSAGES['help'])
-
-
-# does not work =(
-# def is_private(func):
-#     @wraps(func)
-#     async def wrap(message):
-#         print('123')
-#         if message.chat.type == 'private':
-#             return
-#         return await func(message)
-#     return wrap

@@ -18,6 +18,10 @@ class UserError(ServiceError):
     pass
 
 
+class ChatError(ServiceError):
+    pass
+
+
 def to_custom_exc(exc:Exception, user_id:str):
     if not isinstance(exc, ServiceError):
         exc = ErrorToCustom(exc, user=user_id)

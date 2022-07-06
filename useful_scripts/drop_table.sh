@@ -1,1 +1,1 @@
-psql -U shiller -d shill_db -h localhost --password shill -f drop_table.sql
+psql -U shiller -d shill_db -h localhost --password shill -f useful_scripts/drop_table.sql

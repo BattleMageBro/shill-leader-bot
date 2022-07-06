@@ -1,7 +1,9 @@
+# toDo вынести в отдельный конфиг файл и запилить уи-шку для того чтобы на ходу подкладывать сообщения, понять структуру нужную
 MESSAGES = {
     'stateReset': 'Argument not found',
     'invalidKey': 'Key is invalid {key}',
     'stateChange': 'Successfully change state',
+
     'help': 'Possible commands are:\n /help \n /start_shilling \n /stop_shilling',
     'success_start': 'Hello and Welcome to ShillLeaderBot. Now you can choose options for shilling and start shill. Type /help to show all possible commands',
 

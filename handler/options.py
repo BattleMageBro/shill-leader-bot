@@ -11,25 +11,12 @@ from postgres.handlers import user_handler, chat_handler
 
 async def shill_message(message:types.Message):
     user_uuid = message.from_user.id
-    user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+    _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
 
     shill_message = message.text
     data = {'shill_message': shill_message}
     await chat_handler.patch(chat_uuid, data)
     await message.answer(MESSAGES['choose_shill_message_success'].format(shill_message))
-
-@dp.message_handler(state='*', commands=['get_chat_info'], chat_type=types.ChatType.PRIVATE)
-async def get_chat_options(message:types.Message):
-    user_uuid = message.from_user.id
-    try:
-        user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
-        chat = await chat_handler.get(chat_uuid)
-        await message.answer(chat)
-    except Exception as exc:
-        exc = to_custom_exc(exc, user_uuid)
-        log.error(exc.dev_message)
-        await message.answer(exc.user_message)
-        return
 
 @dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['choose_options'], chat_type=types.ChatType.PRIVATE)
 async def start_choosing_options(message:types.Message):
@@ -82,7 +69,7 @@ async def choose_links_opts(message:types.Message):
     user_uuid = message.from_user.id
     state = dp.current_state(user=user_uuid)
     try:
-        user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+        _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
 
         links = message.text.replace(' ', '').split(',')
         data = {'shill_links': links}
@@ -104,7 +91,7 @@ async def choose_timeout(message:types.Message):
     user_uuid = message.from_user.id
     state = dp.current_state(user=user_uuid)
     try:
-        user, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+        _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
         data = {'shill_timeout': int(message.text)}
         await chat_handler.patch(chat_uuid, data)
         await state.set_state(BotStates.PENDING[0])
@@ -113,5 +100,18 @@ async def choose_timeout(message:types.Message):
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)
         await state.set_state(BotStates.PENDING[0])
+        await message.answer(exc.user_message)
+        return
+
+@dp.message_handler(state='*', commands=['get_chat_info'], chat_type=types.ChatType.PRIVATE)
+async def get_chat_options(message:types.Message):
+    user_uuid = message.from_user.id
+    try:
+        _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
+        chat = await chat_handler.get(chat_uuid)
+        await message.answer(chat)
+    except Exception as exc:
+        exc = to_custom_exc(exc, user_uuid)
+        log.error(exc.dev_message)
         await message.answer(exc.user_message)
         return

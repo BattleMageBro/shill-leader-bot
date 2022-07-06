@@ -4,7 +4,7 @@ from core import dp, bot, postgres
 from postgres.handlers import user_handler, chat_handler, user_chat_handler
 from logg import log
 from messages import MESSAGES
-from exceptions import to_custom_exc
+from exceptions import to_custom_exc, ChatError
 from states import BotStates
 from aiogram.dispatcher.filters import Text
 
@@ -52,11 +52,8 @@ async def choose_chat(callback_query:types.CallbackQuery):
     await callback_query.message.answer(MESSAGES['choose_chat_success'])
     await callback_query.answer()
 
-@dp.message_handler(state='*', commands=['add_shillbot'], is_chat_admin=True)
+@dp.message_handler(state='*', commands=['add_shillbot'], is_chat_admin=True, chat_type=types.ChatType.GROUP)
 async def create_user_chat(message: types.Message):
-    if not is_group(message.chat.type):
-        return
-    member = await message.chat.get_member(message.from_user.id)
     try:
         user_uuid = message.from_user.id
         chat_uuid = message.chat.id
@@ -72,12 +69,3 @@ async def create_user_chat(message: types.Message):
         log.error(exc.dev_message)
         await message.answer(exc.user_message)
         return
-
-
-# --------------- for tests ---------------
-
-@dp.message_handler(state=[None], commands='test2')
-async def test_handler(message: types.Message):
-    user = await user_handler.get(message.from_user.id)
-    log.debug(user['user_uuid'])
-    log.debug(user['current_chat'])
