@@ -15,6 +15,7 @@ MESSAGES = {
     'choose_shill_message_success': 'ShillMessage choosen and it is:\n{}',
     'choose_chat': 'Please choose chat from this list',
     'choose_chat_success': 'Hey we choose chat',
+    'choose_packs': 'Now choose pack you want to shill',
     'choose_links': 'Please type links separating with ","',
     'choose_links_success': 'Links for shilling are succesfully choosen',
     'choose_timeout': 'Please choose time between shilling links in seconds. Default parameter is 60 seconds',
