@@ -5,6 +5,7 @@ class ServiceError(Exception):
     def __init__(self, **kwargs):
         self.user_message = kwargs.get('user_message')
         self.dev_message = kwargs.get('dev_message')
+        self.retry = kwargs.get('retry') or False
         super(ServiceError, self).__init__()
 
 

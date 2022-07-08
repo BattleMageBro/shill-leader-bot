@@ -9,22 +9,25 @@ from states import BotStates
 from aiogram.dispatcher.filters import Text
 
 
-async def check_create_chat(chat_uuid):
+async def check_create_chat(chat_uuid:int, chat_name:str):
     chat = await chat_handler.get(chat_uuid)
     log.debug(chat)
     if not chat:
-        data = {'chat_uuid': chat_uuid}
+        data = {'chat_uuid': chat_uuid, 'chat_name': chat_name}
         await chat_handler.post(data)
     return chat
 
 @dp.message_handler(state='*', commands=['choose_chat'], chat_type=types.ChatType.PRIVATE)
 async def choose_chat_start(message:types.Message):
     user_uuid = message.from_user.id
-    chats = await user_chat_handler.get_chats_by_user(user_uuid)
+    chats = await user_chat_handler.get_chats_with_names(user_uuid)
+    if not chats:
+        await message.answer(MESSAGES['no_chats'])
+        return
     state = dp.current_state(user=user_uuid)
     inline_keyboard = types.InlineKeyboardMarkup(row_width=2)
     for item in chats:
-        inline_keyboard.add(types.InlineKeyboardButton(text=str(item['chat_uuid']), callback_data=str(item['chat_uuid'])))
+        inline_keyboard.add(types.InlineKeyboardButton(text=str(item['chat_name']), callback_data=str(item['chat_uuid'])))
     await state.set_state(BotStates.CHOOSE_CHAT[0])
     await message.answer(MESSAGES['choose_chat'], reply_markup=inline_keyboard)
 
@@ -57,7 +60,7 @@ async def create_user_chat(message: types.Message):
     try:
         user_uuid = message.from_user.id
         chat_uuid = message.chat.id
-        await check_create_chat(chat_uuid)
+        await check_create_chat(chat_uuid, message.chat.title)
         if not await user_chat_handler.have_link(user_uuid, chat_uuid):
             await user_chat_handler.post({"user_uuid": user_uuid, "chat_uuid": chat_uuid})
             await user_handler.patch(user_uuid, {'current_chat': chat_uuid})

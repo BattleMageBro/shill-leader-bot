@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS chat (
     shill_message text,
     shill_links varchar(255)[],
     shill_timeout integer default 60,
-    msg_timeout integer default 1
+    msg_timeout integer default 1,
+    shill_end float default 1
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -19,6 +20,6 @@ CREATE TABLE IF NOT EXISTS user_chat (
 
 CREATE TABLE IF NOT EXISTS packs (
     pack_uuid serial primary key,
-    pack_desctiption text
-    shill_links varchar(255)[],
-);references
+    pack_description text,
+    shill_links varchar(255)[]
+);

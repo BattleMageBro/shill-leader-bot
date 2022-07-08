@@ -22,3 +22,5 @@ class BotStates(Helper):
     CHOOSE_SHILL_MESSAGE = ListItem()
     CHOOSE_SHILL_MESSAGE_OPTS = ListItem()
     CHOOSE_TIMEOUT = ListItem()
+    CHOOSE_TIMEOUT_OPTS = ListItem()
+    CHOOSE_SHILL_END = ListItem()

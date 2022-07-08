@@ -7,7 +7,7 @@ from states import BotStates
 import asyncio
 from handler import utils
 from logg import log
-from exceptions import UserError, to_custom_exc
+from exceptions import UserError, ChatError, to_custom_exc
 from postgres.handlers import user_handler, chat_handler
 
 
@@ -26,9 +26,15 @@ async def shill_start(message: types.Message):
         current_transitions.append(user_uuid)
         _, chat_uuid = await user_handler.get_user_with_chat(user_uuid)
         chat = await chat_handler.get(chat_uuid)
-        end_time = datetime.datetime.now().timestamp() + 59 # ToDo create config parameter
+        end_timeout = chat.get('shill_end', 1) * 3600
+        end_time = datetime.datetime.now().timestamp() + end_timeout
         shill_messages = ['3', '2', '1'].append(chat['shill_message'])
         msg_timeout, shill_timeout = chat['msg_timeout'], chat['shill_timeout']
+        if not chat['shill_links'] or not chat['shill_message']:
+            raise ChatError(
+                user_message='Please fill chat options before start shilling. You can do it with commands /choose_options or with single command see all /commands',
+                dev_message='Start shilling without options user {}'.format(user_uuid)
+            )
         while datetime.datetime.now().timestamp() < end_time and user_uuid in current_transitions:
             for link in chat['shill_links']:
                 msg = f'{link}  -  {chat["shill_message"]}'
@@ -38,7 +44,7 @@ async def shill_start(message: types.Message):
                     await bot.send_message(chat_id=chat_uuid, text=item)
                     await asyncio.sleep(msg_timeout)
                 await asyncio.sleep(shill_timeout)
-                if user_uuid not in current_transitions:
+                if user_uuid not in current_transitions or datetime.datetime.now().timestamp() > end_time:
                     break
         if user_uuid in current_transitions:
             current_transitions.remove(user_uuid)

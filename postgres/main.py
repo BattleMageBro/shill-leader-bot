@@ -101,6 +101,22 @@ class Postgres():
             res = await conn.fetch(text)
             log.debug(res)
             return res
+    
+    async def select_join(self, select_cond, table, search_cond, join_cond):
+        if not self.pool:
+            raise
+        async with self.pool.acquire() as conn:
+            search_string = ''
+            for item in search_cond:
+                if type(search_cond[item]) == str:
+                    search_cond[item] = f"'{search_cond[item]}'"
+                search_string = f'{search_string} AND {item}={search_cond[item]}'.lstrip(' AND')
+            text = f"SELECT {select_cond} FROM {table} JOIN {join_cond['table']} ON {join_cond['cond']} WHERE {search_string}"
+            text = text.rstrip(' WHERE ')
+            log.debug(text)
+            res = await conn.fetch(text)
+            log.debug(res)
+            return res
         
 
 

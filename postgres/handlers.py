@@ -52,6 +52,7 @@ class ChatHandler():
     
     async def patch(self, chat_uuid, data):
         index_name = 'chat_uuid'
+        log.debug(data)
         await postgres.update(self.table_name, index_name, chat_uuid, data)
 
     async def post(self, data):
@@ -85,8 +86,43 @@ class UserChatHandler():
         if links:
             return True
         return False
+    
+    async def get_chats_with_names(self, user_uuid):
+        search_condintions = {'user_chat.user_uuid': user_uuid}
+        select_conditions = 'user_chat.chat_uuid,user_chat.user_uuid,chat.chat_name'
+        join_conditions = {'table': 'chat', 'cond': 'user_chat.chat_uuid=chat.chat_uuid'}
+        chats = await postgres.select_join(select_conditions, self.table_name, search_condintions, join_conditions)
+        if type(chats) != list:
+            chats = []
+        return chats
+
+
+class PacksHandler():
+    def __init__(self):
+        self.table_name = 'packs'
+
+    async def get(self, pack_uuid):
+        select_condintions = {'pack_uuid': pack_uuid}
+        pack = await postgres.select(self.table_name, select_condintions)
+        if type(pack) == list and len(pack) != 0:
+            pack = pack[0]
+        else:
+            pack = None
+        return pack
+    
+    async def get_all(self):
+        packs = await postgres.select(self.table_name, {})
+        return packs
+
+    async def patch(self, pack_uuid, data):
+        index_name = 'pack_uuid'
+        await postgres.update(self.table_name, index_name, pack_uuid, data)
+
+    async def post(self, data):
+        await postgres.insert(self.table_name, data)
 
 
 user_handler = UserHandler()
 chat_handler = ChatHandler()
 user_chat_handler = UserChatHandler()
+packs_handler = PacksHandler()
