@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS chat (
-    chat_uuid serial primary key,
+    chat_uuid bigint unique,
     chat_name varchar(512),
     shill_message text,
     shill_links varchar(255)[],
@@ -9,13 +9,13 @@ CREATE TABLE IF NOT EXISTS chat (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-    user_uuid serial primary key,
+    user_uuid bigint unique,
     current_chat integer references chat (chat_uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_chat (
-    chat_uuid integer references chat (chat_uuid) ON DELETE CASCADE,
-    user_uuid integer references users (user_uuid) ON DELETE CASCADE
+    chat_uuid bigint references chat (chat_uuid) ON DELETE CASCADE,
+    user_uuid bigint references users (user_uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS packs (

@@ -55,7 +55,7 @@ async def choose_chat(callback_query:types.CallbackQuery):
     await callback_query.message.answer(MESSAGES['choose_chat_success'])
     await callback_query.answer()
 
-@dp.message_handler(state='*', commands=['add_shillbot'], is_chat_admin=True, chat_type=types.ChatType.GROUP)
+@dp.message_handler(state='*', commands=['add_shillbot'], is_chat_admin=True)
 async def create_user_chat(message: types.Message):
     try:
         user_uuid = message.from_user.id
