@@ -1,0 +1,1 @@
+psql -U shiller -d shill_db -h localhost --password shill -f useful_scripts/packs.sql

@@ -1,12 +1,12 @@
 import os
-from dotenv import load_dotenv, dotenv_values
 
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-a = False
-config = {}
-
-if os.path.exists(dotenv_path):
-    a = load_dotenv(dotenv_path)
-if a:
-    config = dotenv_values(".env")
+config = {
+    "TOKEN": os.environ.get("TOKEN", "token"),
+    "SQL_USER": os.environ.get("SQL_USER"),
+    "SQL_PASSWORD": os.environ.get("SQL_PASSWORD", "shill"),
+    "SQL_DB": os.environ.get("SQL_DB", "shill_db"),
+    "SQL_HOST": os.environ.get("SQL_HOST", "localhost"),
+    "SQL_PORT": os.environ.get("SQL_PORT", 5432),
+    "LOG_LEVEL": os.environ.get("LOG_LEVEL", "DEBUG")
+}

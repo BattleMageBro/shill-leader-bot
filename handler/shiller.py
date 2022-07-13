@@ -13,7 +13,7 @@ from postgres.handlers import user_handler, chat_handler
 
 current_transitions = []
 
-@dp.message_handler(state='*', commands=['shill_start'], chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(state='*', commands=['start_shilling'], chat_type=types.ChatType.PRIVATE)
 async def shill_start(message: types.Message):
     # ToDo создать спейс транзишенов в постгре и записывать туда все а не в оперативку
     user_uuid = message.from_user.id
@@ -55,7 +55,7 @@ async def shill_start(message: types.Message):
         current_transitions.remove(user_uuid)
         return
 
-@dp.message_handler(state='*', commands=['shill_stop'], chat_type=types.ChatType.PRIVATE)
+@dp.message_handler(state='*', commands=['stop_shilling'], chat_type=types.ChatType.PRIVATE)
 async def shill_stop(message:types.Message):
     # ToDo создать спейс транзишенов в постгре и записывать туда все а не в оперативку
     if message.from_user.id in current_transitions:

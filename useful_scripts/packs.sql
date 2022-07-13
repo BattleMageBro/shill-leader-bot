@@ -1,0 +1,1 @@
+insert into packs values (1, 'Hardshilling', ARRAY['hardtest1.com', 'hardtest2.ru']),(2, 'Softshilling', ARRAY['softtest1.com', 'softtest2.ru']),(3, 'Supersoftshilling', ARRAY['supersofttest1.com', 'supersofttest2.ru']);

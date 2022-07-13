@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  pg_db:
+    image: postgres:12
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=shill
+      - POSTGRES_USER=shiller
+      - POSTGRES_DB=shill_db
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+
+  bot:
+    build:
+      context: /home/kuprik/projects/shill-leader-bot
+      dockerfile: Dockerfile
+    image: result/latest
+    env_file:
+      - /home/kuprik/projects/shill-leader-bot/prod.env
+    ports:
+      - "8000:8000"
+    depends_on: 
+      - pg_db
+
+volumes:
+  postgres-data:

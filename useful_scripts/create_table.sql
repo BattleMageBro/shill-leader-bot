@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS chat (
 
 CREATE TABLE IF NOT EXISTS users (
     user_uuid bigint unique,
-    current_chat integer references chat (chat_uuid) ON DELETE CASCADE
+    current_chat bigint references chat (chat_uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_chat (
