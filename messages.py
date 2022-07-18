@@ -44,5 +44,15 @@ VIP Channels - Shilling groups with huge whales in them. Respected owners and st
 Now you can start shilling process by pressing /start_shilling. To stop the process press /stop_shilling """ ,
 
     'chat_added': 'Successfully added chat, now you can set up bot\'s preferences by opening chat with bot. Then use /choose_options to start. Good luck!',
-    'no_chats': 'You have no added chats. Please add ShillBot to group and make a bot Admin. Then use /add_shillbot command in your chat.'
+}
+
+ERRORS = {
+    'no_chats': 'You have no added chats. Please add ShillBot to group and make a bot Admin. Then use /add_shillbot command in your chat.',
+    'chat_not_exist': "Chat you want to choose doesn\'t exist. Please try /add_shillbot to your Group or contact us.",
+    'wrong_opts_data': 'Такой вообще быть не должно к нам надо отправлять значит где то поломка',
+    'timeout_format': "Incorrect value for timeout. This must be integer or float. Please choose timeout again",
+    'end_timeout_format': 'Incorrect value for end timeout. This must be integer or float. Please choose timeout again',
+    'start_shilling': 'Please fill chat options before start shilling. You can do it with commands /choose_options or with single command see all /commands',
+    'no_user': 'Sorry user with your\'s id {} doesn\'t exist in our database. Please email to support.shill_leader@gmail.com we\'ll help you',
+    'no_current_chat': 'You have no choosen chat to work with. Please type /choose_chat if you already added chats to ShillLeaderBot or add new chat',
 }

@@ -22,6 +22,9 @@ class UserError(ServiceError):
 class ChatError(ServiceError):
     pass
 
+class OptsError(ServiceError):
+    pass
+
 
 def to_custom_exc(exc:Exception, user_id:str):
     if not isinstance(exc, ServiceError):

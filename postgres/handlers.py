@@ -1,6 +1,7 @@
 from core import postgres
 from exceptions import UserError
 from logg import log
+from messages import ERRORS
 
 
 class UserHandler():
@@ -13,8 +14,7 @@ class UserHandler():
         if type(user) == list and len(user) != 0:
             user = user[0]
         else:
-            user_message = ('Sorry user with your\'s id {} doesn\'t exist in our database.'
-                            'Please email to support.shill_leader@gmail.com we\'ll help you').format(user_uuid)
+            user_message = (ERRORS['no_user']).format(user_uuid)
             dev_message = 'no user with id: {}'.format(user_uuid)
             raise UserError(user_message=user_message, dev_message=dev_message)
         log.info(f'GET {self.table_name} with id {user_uuid}')
@@ -24,8 +24,7 @@ class UserHandler():
         user = await self.get(user_uuid)
         chat_uuid = user.get('current_chat')
         if not chat_uuid:
-            user_message = ('You have no choosen chat to work with.' 
-                            'Please type /choose_chat if you already added chats to ShillLeaderBot or add new chat')
+            user_message = (ERRORS['no_current_chat'])
             dev_message = 'User with id {} has no current_chat'.format(user_uuid)
             raise UserError(user_message=user_message, dev_message=dev_message)
         log.info(f'GET_WITH_CHAT {self.table_name} with id {user_uuid} current_chat {chat_uuid}')

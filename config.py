@@ -3,7 +3,7 @@ import os
 
 config = {
     "TOKEN": os.environ.get("TOKEN", "token"),
-    "SQL_USER": os.environ.get("SQL_USER"),
+    "SQL_USER": os.environ.get("SQL_USER", 'shiller'),
     "SQL_PASSWORD": os.environ.get("SQL_PASSWORD", "shill"),
     "SQL_DB": os.environ.get("SQL_DB", "shill_db"),
     "SQL_HOST": os.environ.get("SQL_HOST", "localhost"),

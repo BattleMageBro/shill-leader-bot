@@ -32,7 +32,7 @@ async def shill_start(message: types.Message):
         msg_timeout, shill_timeout = chat['msg_timeout'], chat['shill_timeout']
         if not chat['shill_links'] or not chat['shill_message']:
             raise ChatError(
-                user_message='Please fill chat options before start shilling. You can do it with commands /choose_options or with single command see all /commands',
+                user_message=['start_shilling'],
                 dev_message='Start shilling without options user {}'.format(user_uuid)
             )
         while datetime.datetime.now().timestamp() < end_time and user_uuid in current_transitions:

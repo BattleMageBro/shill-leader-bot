@@ -3,7 +3,7 @@ from asyncpg import UniqueViolationError
 from core import dp, bot, postgres
 from postgres.handlers import user_handler, chat_handler, user_chat_handler
 from logg import log
-from messages import MESSAGES
+from messages import MESSAGES, ERRORS
 from exceptions import to_custom_exc, ChatError
 from states import BotStates
 from aiogram.dispatcher.filters import Text
@@ -22,7 +22,7 @@ async def choose_chat_start(message:types.Message):
     user_uuid = message.from_user.id
     chats = await user_chat_handler.get_chats_with_names(user_uuid)
     if not chats:
-        await message.answer(MESSAGES['no_chats'])
+        await message.answer(ERRORS['no_chats'])
         return
     state = dp.current_state(user=user_uuid)
     inline_keyboard = types.InlineKeyboardMarkup(row_width=2)
@@ -41,7 +41,7 @@ async def choose_chat(callback_query:types.CallbackQuery):
         chat = await chat_handler.get(chat_uuid)
         if not chat:
             raise ChatError(
-                user_message="Chat you want to choose doesn\'t exist. Please try /add_shillbot to your Group or contact us.",
+                user_message=ERRORS['chat_not_exist'],
                 dev_message="User with id {} try to choose chat with id {} as current. Chat not found".format(user_uuid, chat_uuid)
             )
         await user_handler.patch(user_uuid, {'current_chat': chat_uuid})

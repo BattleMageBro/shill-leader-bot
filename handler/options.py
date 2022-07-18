@@ -3,9 +3,9 @@ import json
 from aiogram import types
 from core import dp
 from states import BotStates
-from messages import MESSAGES
+from messages import MESSAGES, ERRORS
 from logg import log
-from exceptions import to_custom_exc, ServiceError
+from exceptions import to_custom_exc, ServiceError, OptsError
 from postgres.handlers import user_handler, chat_handler, packs_handler
 
 
@@ -54,7 +54,10 @@ async def choose_pack_or_self(callback:types.CallbackQuery):
         choose_opt = callback.data.replace('choose_', '')
         opts = options.get(choose_opt, {})
         if not opts:
-            raise
+            raise OptsError(
+                dev_message = "handler.options.choose_pach_or_self fail for user {} with data {}".format(user_uuid, callback.data),
+                user_message = ERRORS['wrong_opts_data']
+            )
         await callback.message.answer(opts['msg'])
         await state.set_state(opts['state'])
         if opts['func']:
@@ -165,7 +168,7 @@ async def choose_timeout_opts(message:types.Message):
         await state.set_state(BotStates.CHOOSE_SHILL_END[0])
     except ValueError:
         log.error("User with id {} try to choose {} as timeout".format(user_uuid, message.text))
-        await message.answer("Incorrect value for timeout. This must be integer or float. Please choose timeout again")
+        await message.answer(ERRORS['timeout_format'])
         return
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
@@ -189,7 +192,7 @@ async def choose_shill_end(message:types.Message):
         await state.set_state(BotStates.PENDING[0])
     except ValueError:
         log.error("User with id {} try to choose {} as end timeout".format(user_uuid, message.text))
-        await message.answer("Incorrect value for end timeout. This must be integer or float. Please choose timeout again")
+        await message.answer(ERRORS['end_timeout_format'])
         return
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
@@ -306,7 +309,7 @@ async def choose_timeout(message:types.Message):
         await message.answer(MESSAGES['choose_timeout_success'].format(int(timeout)))
     except ValueError:
         log.error("User with id {} try to choose {} as timeout".format(user_uuid, message.text))
-        await message.answer("Incorrect value for timeout. This must be integer or float. Please choose timeout again")
+        await message.answer(ERRORS['timeout_format'])
         return
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
