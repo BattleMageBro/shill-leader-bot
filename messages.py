@@ -14,7 +14,9 @@ MESSAGES = {
 /choose_packs_start - press to choose between shilling packs 
 /choose_links - press to input group links to create your own shilling list 
 /choose_timeout - press to choose time between shilling messages posted by bot 
-/choose_shill_end - press to create a timer for stoping the shilling process""",
+/choose_shill_end - press to create a timer for stoping the shilling process
+
+You can choose different shilling options for different chats""",
 
     'success_start': """Hello and Welcome to ShillLeaderBot. Now you need to add Bot to your group chat and make a bot Admin. Make sure it is able to: Change group info, Delete messages, Ban users, Invite users via link, Pin messages, Manage video chats. Then use /add_shillbot command in your chat.
 
@@ -47,12 +49,12 @@ Now you can start shilling process by pressing /start_shilling. To stop the proc
 }
 
 ERRORS = {
-    'no_chats': 'You have no added chats. Please add ShillBot to group and make a bot Admin. Then use /add_shillbot command in your chat.',
-    'chat_not_exist': "Chat you want to choose doesn\'t exist. Please try /add_shillbot to your Group or contact us.",
-    'wrong_opts_data': 'Такой вообще быть не должно к нам надо отправлять значит где то поломка',
+    'no_chats': 'You have no added chats. Please add ShillBot to the group chat you are managing and make a bot - Admin. Then use /add_shillbot command and return to this chat.',
+    'chat_not_exist': "Chat you want to choose doesn\'t exist. Please try command /add_shillbot in your group chat or contact us @shillleaderbotchat.",
+    'wrong_opts_data': 'please contact support chat @shillleaderbotchat',
     'timeout_format': "Incorrect value for timeout. This must be integer or float. Please choose timeout again",
     'end_timeout_format': 'Incorrect value for end timeout. This must be integer or float. Please choose timeout again',
-    'start_shilling': 'Please fill chat options before start shilling. You can do it with commands /choose_options or with single command see all /commands',
-    'no_user': 'Sorry user with your\'s id {} doesn\'t exist in our database. Please email to support.shill_leader@gmail.com we\'ll help you',
-    'no_current_chat': 'You have no choosen chat to work with. Please type /choose_chat if you already added chats to ShillLeaderBot or add new chat',
+    'start_shilling': 'Please fill shilling options before starting shilling process. You can do it with command /choose_options ',
+    'no_user': 'Sorry user with your id {} doesn\'t exist in our database. Please contact support chat @shillleaderbotchat ',
+    'no_current_chat': 'You have no chosen chat to work with. Please type /choose_chat if you already added ShillLeaderBot to your group chat or add new chat',
 }

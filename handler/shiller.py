@@ -37,9 +37,9 @@ async def shill_start(message: types.Message):
             )
         while datetime.datetime.now().timestamp() < end_time and user_uuid in current_transitions:
             for link in chat['shill_links']:
-                msg = f'{link}  -  {chat["shill_message"]}'
                 shill_messages = ['3', '2', '1']
-                shill_messages.append(msg)
+                shill_messages.append(chat["shill_message"])
+                shill_messages.append(link)
                 for item in shill_messages:
                     await bot.send_message(chat_id=chat_uuid, text=item)
                     await asyncio.sleep(msg_timeout)
