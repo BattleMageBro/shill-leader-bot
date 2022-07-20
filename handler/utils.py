@@ -29,3 +29,8 @@ async def process_setstate_command(message: types.Message):
 @dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['help'], chat_type=types.ChatType.PRIVATE)
 async def help_case(message: types.Message):
     await message.answer(MESSAGES['help'])
+
+@dp.message_handler(state=BotStates.all(), chat_type=types.ChatType.PRIVATE)
+async def some_test_state_case_met(message: types.Message):
+    text = 'wtf noone catch this before'
+    await message.reply(text, reply=False)

@@ -58,13 +58,3 @@ async def shill_stop(message:types.Message):
     # ToDo создать спейс транзишенов в постгре и записывать туда все а не в оперативку
     if message.from_user.id in current_transitions:
         current_transitions.remove(message.from_user.id)
-
-@dp.message_handler(state=[None, BotStates.PENDING], chat_type=types.ChatType.PRIVATE)
-async def first_test_state_case_met(message: types.Message):
-    log.debug(message)
-    await message.reply('мы на самом старте!', reply=False)
-
-@dp.message_handler(state=BotStates.all(), chat_type=types.ChatType.PRIVATE)
-async def some_test_state_case_met(message: types.Message):
-    text = 'wtf noone catch this before'
-    await message.reply(text, reply=False)
