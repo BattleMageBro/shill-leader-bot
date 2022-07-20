@@ -1,11 +1,9 @@
 from aiogram import types
 from core import dp, bot
-import os, time
 import datetime
-from messages import MESSAGES
+from messages import ERRORS
 from states import BotStates
 import asyncio
-from handler import utils
 from logg import log
 from exceptions import UserError, ChatError, to_custom_exc
 from postgres.handlers import user_handler, chat_handler
@@ -20,7 +18,7 @@ async def shill_start(message: types.Message):
     try:
         if user_uuid in current_transitions:
             raise UserError(
-                user_message='You already shilling. End shill with /end_shill command, choose other chat and options if needed and start again',
+                user_message=ERRORS['already_shilling'],
                 dev_message='Double shilling by user {}'.format(user_uuid)
             )
         current_transitions.append(user_uuid)
@@ -32,7 +30,7 @@ async def shill_start(message: types.Message):
         msg_timeout, shill_timeout = chat['msg_timeout'], chat['shill_timeout']
         if not chat['shill_links'] or not chat['shill_message']:
             raise ChatError(
-                user_message=['start_shilling'],
+                user_message=ERRORS['start_shilling'],
                 dev_message='Start shilling without options user {}'.format(user_uuid)
             )
         while datetime.datetime.now().timestamp() < end_time and user_uuid in current_transitions:
