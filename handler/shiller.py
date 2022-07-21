@@ -2,7 +2,6 @@ from aiogram import types
 from core import dp, bot
 import datetime
 from messages import ERRORS
-from states import BotStates
 import asyncio
 from logg import log
 from exceptions import UserError, ChatError, to_custom_exc

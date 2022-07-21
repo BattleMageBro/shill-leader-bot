@@ -13,6 +13,7 @@ class ErrorToCustom(ServiceError):
     def __init__(self, exc, **kwargs):
         self.user_message = 'Unhandled error. Please try again later or contact support.'
         self.dev_message = f'Error. User: {kwargs.get("user")}. Caught {exc.__class__.__name__} with message: {exc.args[0]}'
+        super(ServiceError, self).__init__()
 
 
 class UserError(ServiceError):
@@ -21,6 +22,7 @@ class UserError(ServiceError):
 
 class ChatError(ServiceError):
     pass
+
 
 class OptsError(ServiceError):
     pass

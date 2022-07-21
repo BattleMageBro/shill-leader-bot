@@ -17,11 +17,11 @@ services:
 
   bot:
     build:
-      context: /home/kuprik/projects/shill-leader-bot
+      context: ~/single_projects/shill-leader-bot
       dockerfile: Dockerfile
     image: result/latest
     env_file:
-      - /home/kuprik/projects/shill-leader-bot/prod.env
+      - ~/single_projects/shill-leader-bot/prod.env
     ports:
       - "8000:8000"
     depends_on: 

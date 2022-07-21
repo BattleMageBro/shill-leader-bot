@@ -20,21 +20,6 @@ class Postgres():
                 await asyncio.sleep(10)
         return f'successfully created pool: {self.pool}'
 
-    # async def select(self, table, index, value):
-    #     if not self.pool:
-    #         raise
-    #     async with self.pool.acquire() as conn:
-    #         if type(index) == 
-    #         if type(value) == str:
-    #             value = f"'{value}'"
-    #         if type(value) == int:
-    #             value = f"{value}"
-    #         text = f"SELECT * FROM {table} WHERE {index}={value}"
-    #         log.debug(text)
-    #         res = await conn.fetch(text)
-    #         log.debug(res)
-    #         return res
-
     async def select(self, table, select_cond):
         if not self.pool:
             raise

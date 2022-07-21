@@ -59,6 +59,7 @@ async def choose_chat(callback_query:types.CallbackQuery):
 async def create_user_chat(message: types.Message):
     try:
         user_uuid = message.from_user.id
+        await user_handler.get(user_uuid)
         chat_uuid = message.chat.id
         await check_create_chat(chat_uuid, message.chat.title)
         if not await user_chat_handler.have_link(user_uuid, chat_uuid):
