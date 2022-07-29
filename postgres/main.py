@@ -20,21 +20,6 @@ class Postgres():
                 await asyncio.sleep(10)
         return f'successfully created pool: {self.pool}'
 
-    # async def select(self, table, index, value):
-    #     if not self.pool:
-    #         raise
-    #     async with self.pool.acquire() as conn:
-    #         if type(index) == 
-    #         if type(value) == str:
-    #             value = f"'{value}'"
-    #         if type(value) == int:
-    #             value = f"{value}"
-    #         text = f"SELECT * FROM {table} WHERE {index}={value}"
-    #         log.debug(text)
-    #         res = await conn.fetch(text)
-    #         log.debug(res)
-    #         return res
-
     async def select(self, table, select_cond):
         if not self.pool:
             raise
@@ -97,6 +82,22 @@ class Postgres():
                     values = f"{values}, {key} = {item}"
             select_cond = f"{index} = {select_index}"
             text = f"UPDATE {table} SET {values} WHERE {select_cond};"
+            log.debug(text)
+            res = await conn.fetch(text)
+            log.debug(res)
+            return res
+    
+    async def select_join(self, select_cond, table, search_cond, join_cond):
+        if not self.pool:
+            raise
+        async with self.pool.acquire() as conn:
+            search_string = ''
+            for item in search_cond:
+                if type(search_cond[item]) == str:
+                    search_cond[item] = f"'{search_cond[item]}'"
+                search_string = f'{search_string} AND {item}={search_cond[item]}'.lstrip(' AND')
+            text = f"SELECT {select_cond} FROM {table} JOIN {join_cond['table']} ON {join_cond['cond']} WHERE {search_string}"
+            text = text.rstrip(' WHERE ')
             log.debug(text)
             res = await conn.fetch(text)
             log.debug(res)

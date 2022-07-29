@@ -1,4 +1,6 @@
 from loguru import logger
+from config import config
 
 log = logger
-log.add('out.log', backtrace=True, diagnose=True)
+open('out.log', 'w').close()
+log.add('out.log', backtrace=True, diagnose=True, level=config['LOG_LEVEL'])
