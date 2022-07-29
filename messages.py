@@ -11,10 +11,10 @@ MESSAGES = {
 /choose_shill_message - press if you want to change your message to a new template 
 /choose_chat - press to select between chats, if you added ShillLeaderBot to more than one group chat 
 /choose_packs - press to get description of our shilling packs 
-/choose_packs_start - press to choose between shilling packs 
 /choose_links - press to input group links to create your own shilling list 
 /choose_timeout - press to choose time between shilling messages posted by bot 
 /choose_shill_end - press to create a timer for stoping the shilling process
+/get_chat_info - press to get current options for chat you are working with at this moment
 
 You can choose different shilling options for different chats""",
 

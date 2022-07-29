@@ -5,6 +5,8 @@ from logg import log
 from states import BotStates
 
 
+#ToDo нужна обработка ошибки BotKicked типо бот был удален из группы, пожалуйста выберите другую группу /choose_chat или добавить бота обратно
+
 @dp.errors_handler(exception=utils.exceptions.NetworkError)
 async def network_main_error(update: types.Update, exception:utils.exceptions.NetworkError):
     log.error(exception)

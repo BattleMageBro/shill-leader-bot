@@ -134,6 +134,7 @@ insert into packs values
     'https://t.me/degenapeschat'
 ]),
 (9, 'Supersoftshilling', ARRAY[
+    'https://t.me/Apecalldiscussion',
     'https://t.me/Satoshi_club',
     'https://t.me/cryptodakurobinhooders',
     'https://t.me/bigmommagems',
@@ -157,6 +158,7 @@ insert into packs values
     'https://t.me/DrakoChatRoom'
 ]),
 (10, 'VipShilling', ARRAY[
+    'https://t.me/Apecalldiscussion',
     'https://t.me/TheSolitaireRoom',
     'https://t.me/DeFiApeTalk',
     'https://t.me/AMA_Central',
