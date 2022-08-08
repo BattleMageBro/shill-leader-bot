@@ -1,4 +1,5 @@
 import json
+from subprocess import call
 
 from aiogram import types
 from core import dp
@@ -11,9 +12,10 @@ from postgres.handlers import user_handler, chat_handler, packs_handler
 
 # this is options process step by step
 
+@dp.callback_query_handler(lambda callback: callback.data == 'back_options', state=[BotStates.CHOOSE_PACKS_OPTS[0], BotStates.CHOOSE_LINKS_OPTS[0]], chat_type=types.ChatType.PRIVATE)
 @dp.message_handler(state=[None, BotStates.PENDING[0]], commands=['choose_options'], chat_type=types.ChatType.PRIVATE)
-async def start_choosing_options(message:types.Message):
-    user_uuid = message.from_user.id
+async def start_choosing_options(message:types.Message or types.CallbackQuery):
+    user_uuid, callback, message = parse_message(message)
     state = dp.current_state(user=user_uuid)
     await user_handler.get_user_with_chat(user_uuid)
     await state.set_state(BotStates.CHOOSE_PACK_OR_SELF[0])
@@ -21,19 +23,23 @@ async def start_choosing_options(message:types.Message):
     keyboard.add(types.InlineKeyboardButton(text='choose links from pack', callback_data='choose_packs'))
     keyboard.add(types.InlineKeyboardButton(text='choose links self', callback_data='choose_self'))
     await message.answer(MESSAGES['choose_options'], reply_markup=keyboard)
+    if callback:
+        await callback.answer()
 
-@dp.callback_query_handler(lambda callback: callback.data.startswith('choose'), state=BotStates.CHOOSE_PACK_OR_SELF[0])
+@dp.callback_query_handler(lambda callback: callback.data.startswith('choose'), state=[BotStates.CHOOSE_PACK_OR_SELF[0], BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0]])
 async def choose_pack_or_self(callback:types.CallbackQuery):
     options = {
         'packs': {
             'func' : choose_packs,
             'state' : BotStates.CHOOSE_PACKS_OPTS[0],
-            'msg' : MESSAGES['choose_packs_start']
+            'msg' : MESSAGES['choose_packs_start'],
+            'keyboard': None
         },
         'self': {
             'func' : None,
             'state' : BotStates.CHOOSE_LINKS_OPTS[0],
-            'msg' : MESSAGES['choose_links']
+            'msg' : MESSAGES['choose_links'],
+            'keyboard': types.InlineKeyboardMarkup(row_width=2)
         },
     }
     user_uuid = callback.from_user.id
@@ -46,7 +52,9 @@ async def choose_pack_or_self(callback:types.CallbackQuery):
                 dev_message = "handler.options.choose_pach_or_self fail for user {} with data {}".format(user_uuid, callback.data),
                 user_message = ERRORS['wrong_opts_data']
             )
-        await callback.message.answer(opts['msg'])
+        if opts['keyboard']:
+            opts['keyboard'].add(types.InlineKeyboardButton(text='back', callback_data='back_options'))
+        await callback.message.answer(opts['msg'], reply_markup=opts['keyboard'])
         await state.set_state(opts['state'])
         if opts['func']:
             await opts['func'](callback.message)
@@ -57,22 +65,23 @@ async def choose_pack_or_self(callback:types.CallbackQuery):
         return
     await callback.answer()
 
-
 async def choose_packs(message:types.Message):
-    user_uuid = message.from_user.id
+    user_uuid, callback, message = parse_message(message)
     try:
         state = dp.current_state(user=user_uuid)
         packs = await packs_handler.get_all()
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         for item in packs:
             keyboard.add(types.InlineKeyboardButton(text=item['pack_description'], callback_data=f'pack_{item["pack_uuid"]}'))
+        keyboard.add(types.InlineKeyboardButton(text='back', callback_data='back_options'))
         await message.answer(MESSAGES['choose_packs'], reply_markup=keyboard)
-        log.debug(packs)
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)
         await message.answer(exc.user_message)
         return
+    if callback:
+        await callback.answer()
 
 @dp.callback_query_handler(lambda callback: callback.data.startswith('pack'), state=BotStates.CHOOSE_PACKS_OPTS[0])
 async def choose_packs_opts_finish(callback:types.CallbackQuery):
@@ -86,7 +95,7 @@ async def choose_packs_opts_finish(callback:types.CallbackQuery):
         await chat_handler.patch(chat_uuid, data)
         await state.set_state(BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0])
         await callback.message.answer(MESSAGES['choose_packs_success'])
-        await callback.message.answer(MESSAGES['choose_shill_message'])
+        await callback.message.answer(MESSAGES['choose_shill_message'], reply_markup=back_keyboard('choose_packs'))
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)
@@ -95,13 +104,17 @@ async def choose_packs_opts_finish(callback:types.CallbackQuery):
     finally:
         await callback.answer()
 
+@dp.callback_query_handler(lambda callback: callback.data == 'back_shill_message', state=[BotStates.CHOOSE_TIMEOUT_OPTS[0]], chat_type=types.ChatType.PRIVATE)
 @dp.message_handler(state=[BotStates.CHOOSE_LINKS_OPTS[0]], chat_type=types.ChatType.PRIVATE)
-async def choose_links_opts(message:types.Message):
-    user_uuid = message.from_user.id
+async def choose_links_opts(message:types.Message or types.CallbackQuery):
+    user_uuid, callback, message = parse_message(message)
     state = dp.current_state(user=user_uuid)
-    await links(message)
+    if not callback:
+        await links(message)
     await state.set_state(BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0])
-    await message.answer(MESSAGES['choose_shill_message'])
+    await message.answer(MESSAGES['choose_shill_message'], reply_markup=back_keyboard('choose_self'))
+    if callback:
+        await callback.answer()
 
 async def links(message:types.Message):
     _, chat_uuid = await user_handler.get_user_with_chat(message.from_user.id)
@@ -111,13 +124,20 @@ async def links(message:types.Message):
     await chat_handler.patch(chat_uuid, data)
     await message.answer(MESSAGES['choose_links_success'])
 
+
+@dp.callback_query_handler(lambda callback: callback.data == 'back_timeout', state=[BotStates.CHOOSE_SHILL_END[0]], chat_type=types.ChatType.PRIVATE)
 @dp.message_handler(state=[BotStates.CHOOSE_SHILL_MESSAGE_OPTS[0]], chat_type=types.ChatType.PRIVATE)
 async def choose_shill_message_opts(message:types.Message):
-    state = dp.current_state(user=message.from_user.id)
-    await shill_message(message)
+    user_uuid, callback, message = parse_message(message)
+    log.warning(user_uuid)
+    state = dp.current_state(user=user_uuid)
+    if not callback:
+        await shill_message(message)
 
     await state.set_state(BotStates.CHOOSE_TIMEOUT_OPTS[0])
-    await message.answer(MESSAGES['choose_timeout'])
+    await message.answer(MESSAGES['choose_timeout'], reply_markup=back_keyboard('back_shill_message'))
+    if callback:
+        await callback.answer()
 
 
 async def shill_message(message:types.Message):
@@ -139,7 +159,7 @@ async def choose_timeout_opts(message:types.Message):
         data = {'shill_timeout': int(timeout)}
         await chat_handler.patch(chat_uuid, data)
         await message.answer(MESSAGES['choose_timeout_success'].format(int(timeout)))
-        await message.answer(MESSAGES['choose_shill_end'])
+        await message.answer(MESSAGES['choose_shill_end'], reply_markup=back_keyboard('back_timeout'))
         await state.set_state(BotStates.CHOOSE_SHILL_END[0])
     except ValueError:
         log.error("User with id {} try to choose {} as timeout".format(user_uuid, message.text))
@@ -244,3 +264,15 @@ async def choose_timeout(message:types.Message):
         await message.answer(ERRORS['end_timeout_format'])
         return
 
+def back_keyboard(callback_text):
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(types.InlineKeyboardButton(text='back', callback_data=callback_text))
+    return keyboard
+
+def parse_message(message:types.Message or types.CallbackQuery):
+    callback = None
+    user_uuid = message.from_user.id
+    if type(message) == types.CallbackQuery:
+        callback = message
+        message = message.message
+    return user_uuid, callback, message

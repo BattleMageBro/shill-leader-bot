@@ -3,6 +3,7 @@ from core import dp
 from exceptions import to_custom_exc
 from logg import log
 from states import BotStates
+from messages import ERRORS
 
 
 #ToDo нужна обработка ошибки BotKicked типо бот был удален из группы, пожалуйста выберите другую группу /choose_chat или добавить бота обратно
@@ -12,6 +13,10 @@ async def network_main_error(update: types.Update, exception:utils.exceptions.Ne
     log.error(exception)
     return True
 
+@dp.errors_handler(exception=utils.exceptions.BotKicked)
+async def bot_kicked_error(update: types.Update, exception:utils.exceptions.NetworkError):
+    await update.message.answer(ERRORS['bot_kicked'])
+    return True
 
 @dp.errors_handler()
 async def default_error_worker(update, exception):

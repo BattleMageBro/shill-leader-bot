@@ -48,7 +48,7 @@ async def to_chat_info_message(chat):
     chat = dict(chat)
     res = ''
     for item in info_shema:
-        res = f'{res}{item} - {chat[info_shema[item]]}\n' 
+        res = f'{res}{item} - {chat[info_shema[item]]}\n\n' 
     return res
 
 @dp.message_handler(state='*', commands=['get_chat_info'], chat_type=types.ChatType.PRIVATE)
@@ -61,5 +61,7 @@ async def get_chat_options(message:types.Message):
 
 @dp.message_handler(state=BotStates.all(), chat_type=types.ChatType.PRIVATE)
 async def some_test_state_case_met(message: types.Message):
+    state = dp.current_state(user=message.from_user.id)
+    log.warning(await state.get_state())
     text = 'wtf noone catch this before'
     await message.reply(text, reply=False)

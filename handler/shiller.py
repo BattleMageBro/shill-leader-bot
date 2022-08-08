@@ -1,4 +1,4 @@
-from aiogram import types
+from aiogram import types, utils
 from core import dp, bot
 import datetime
 from messages import ERRORS
@@ -45,6 +45,10 @@ async def shill_start(message: types.Message):
                     break
         if user_uuid in current_transitions:
             current_transitions.remove(user_uuid)
+    except utils.exceptions.BotKicked:
+        await message.answer(ERRORS['bot_kicked'])
+        current_transitions.remove(user_uuid)
+        return
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)
