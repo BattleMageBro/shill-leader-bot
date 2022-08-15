@@ -21,10 +21,22 @@ services:
       dockerfile: Dockerfile
     image: result/latest
     env_file:
-      - ~/projects/shill-leader-bot/prod.env
+      - ~/projects/shill-leader-bot/test.env
+    ports:
+      - "8080:8080"
+    depends_on: 
+      - pg_db
+
+  web:
+    build:
+      context: ~/projects/admin_panel/shill_admin_panel
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
-    depends_on: 
+    env_file:
+      - ~/projects/shill-leader-bot/test.env
+    depends_on:
       - pg_db
 
 volumes:

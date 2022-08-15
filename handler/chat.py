@@ -44,7 +44,7 @@ async def choose_chat(callback_query:types.CallbackQuery):
                 user_message=ERRORS['chat_not_exist'],
                 dev_message="User with id {} try to choose chat with id {} as current. Chat not found".format(user_uuid, chat_uuid)
             )
-        await user_handler.patch(user_uuid, {'current_chat': chat_uuid})
+        await user_handler.patch(user_uuid, {'current_chat_id': chat_uuid})
     except Exception as exc:
         exc = to_custom_exc(exc, user_uuid)
         log.error(exc.dev_message)
@@ -61,10 +61,11 @@ async def create_user_chat(message: types.Message):
         user_uuid = message.from_user.id
         await user_handler.get(user_uuid)
         chat_uuid = message.chat.id
+        log.warning(chat_uuid)
         await check_create_chat(chat_uuid, message.chat.title)
         if not await user_chat_handler.have_link(user_uuid, chat_uuid):
-            await user_chat_handler.post({"user_uuid": user_uuid, "chat_uuid": chat_uuid})
-            await user_handler.patch(user_uuid, {'current_chat': chat_uuid})
+            await user_chat_handler.post({"user_uuid_id": user_uuid, "chat_uuid_id": chat_uuid})
+            await user_handler.patch(user_uuid, {'current_chat_id': chat_uuid})
             log.info("User with id {} successfully added chat with id {} to chats".format(user_uuid, chat_uuid))
 
         await message.reply(MESSAGES['chat_added'])

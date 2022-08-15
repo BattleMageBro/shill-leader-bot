@@ -2,11 +2,12 @@ from core import postgres
 from exceptions import UserError
 from logg import log
 from messages import ERRORS
+from uuid import uuid4
 
 
 class UserHandler():
     def __init__(self):
-        self.table_name = 'users'
+        self.table_name = 'admin_panel_users'
 
     async def get(self, user_uuid):
         select_condintions = {'user_uuid': user_uuid}
@@ -22,7 +23,7 @@ class UserHandler():
     
     async def get_user_with_chat(self, user_uuid):
         user = await self.get(user_uuid)
-        chat_uuid = user.get('current_chat')
+        chat_uuid = user.get('current_chat_id')
         if not chat_uuid:
             user_message = (ERRORS['no_current_chat'])
             dev_message = 'User with id {} has no current_chat'.format(user_uuid)
@@ -42,7 +43,7 @@ class UserHandler():
 
 class ChatHandler():
     def __init__(self):
-        self.table_name = 'chat'
+        self.table_name = 'admin_panel_chat'
 
     async def get(self, chat_uuid):
         select_condintions = {'chat_uuid': chat_uuid}
@@ -67,10 +68,10 @@ class ChatHandler():
 
 class UserChatHandler():
     def __init__(self):
-        self.table_name = 'user_chat'
+        self.table_name = 'admin_panel_userchat'
 
     async def get_chats_by_user(self, user_uuid):
-        select_condintions = {'user_uuid': user_uuid}
+        select_condintions = {'user_uuid_id': user_uuid}
         chats = await postgres.select(self.table_name, select_condintions)
         if type(chats) != list:
             chats = []
@@ -78,7 +79,7 @@ class UserChatHandler():
         return chats
 
     async def get_users_by_chat(self, chat_uuid):
-        select_condintions = {'chat_uuid': chat_uuid}
+        select_condintions = {'chat_uuid_id': chat_uuid}
         users = await postgres.select(self.table_name, select_condintions)
         if type(users) != list:
             users = []
@@ -90,7 +91,7 @@ class UserChatHandler():
         log.info(f'POST to {self.table_name} with data {data}')
 
     async def have_link(self, user_uuid, chat_uuid):
-        select_conditions = {'chat_uuid': chat_uuid, 'user_uuid': user_uuid}
+        select_conditions = {'chat_uuid_id': chat_uuid, 'user_uuid_id': user_uuid}
         links = await postgres.select(self.table_name, select_conditions)
         if links:
             log.info(f'Found link by user {user_uuid} with chat {chat_uuid}')
@@ -99,9 +100,9 @@ class UserChatHandler():
         return False
     
     async def get_chats_with_names(self, user_uuid):
-        search_condintions = {'user_chat.user_uuid': user_uuid}
-        select_conditions = 'user_chat.chat_uuid,user_chat.user_uuid,chat.chat_name'
-        join_conditions = {'table': 'chat', 'cond': 'user_chat.chat_uuid=chat.chat_uuid'}
+        search_condintions = {'admin_panel_userchat.user_uuid_id': user_uuid}
+        select_conditions = 'admin_panel_userchat.chat_uuid_id,admin_panel_userchat.user_uuid_id,admin_panel_chat.chat_name'
+        join_conditions = {'table': 'chat', 'cond': 'admin_panel_userchat.chat_uuid_id=admin_panelchat.chat_uuid'}
         chats = await postgres.select_join(select_conditions, self.table_name, search_condintions, join_conditions)
         if type(chats) != list:
             chats = []
@@ -111,7 +112,7 @@ class UserChatHandler():
 
 class PacksHandler():
     def __init__(self):
-        self.table_name = 'packs'
+        self.table_name = 'admin_panel_packs'
 
     async def get(self, pack_uuid):
         select_condintions = {'pack_uuid': pack_uuid}
