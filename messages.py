@@ -57,5 +57,6 @@ ERRORS = {
     'start_shilling': 'Please fill shilling options before starting shilling process. You can do it with command /choose_options ',
     'no_user': 'Sorry user with your id {} doesn\'t exist in our database. Please contact support chat @shillleaderbotchat ',
     'no_current_chat': 'You have no chosen chat to work with. Please type /choose_chat if you already added ShillLeaderBot to your group chat or add new chat',
-    'already_shilling': 'You already shilling. End shill with /stop_shilling command, choose other chat and options if needed and start again'
+    'already_shilling': 'You already shilling. End shill with /stop_shilling command, choose other chat and options if needed and start again',
+    'bot_kicked': "Bot was kicked from group you want to shill or bot is no admin more. Please check groupAdmins and make bot Admin then make command /add_shillbot before start shill process. "
 }
