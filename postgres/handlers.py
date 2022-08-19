@@ -2,7 +2,6 @@ from core import postgres
 from exceptions import UserError
 from logg import log
 from messages import ERRORS
-from uuid import uuid4
 
 
 class UserHandler():
@@ -10,7 +9,7 @@ class UserHandler():
         self.table_name = 'admin_panel_users'
 
     async def get(self, user_uuid):
-        select_condintions = {'user_uuid': user_uuid}
+        select_condintions = {'id': user_uuid}
         user = await postgres.select(self.table_name, select_condintions)
         if type(user) == list and len(user) != 0:
             user = user[0]
@@ -32,7 +31,7 @@ class UserHandler():
         return user, chat_uuid
 
     async def patch(self, user_uuid, data):
-        index_name = 'user_uuid'
+        index_name = 'id'
         await postgres.update(self.table_name, index_name, user_uuid, data)
         log.info(f'PATCH {self.table_name} id {user_uuid} with data {data}')
 
@@ -46,7 +45,7 @@ class ChatHandler():
         self.table_name = 'admin_panel_chat'
 
     async def get(self, chat_uuid):
-        select_condintions = {'chat_uuid': chat_uuid}
+        select_condintions = {'id': chat_uuid}
         chat = await postgres.select(self.table_name, select_condintions)
         if type(chat) == list and len(chat) != 0:
             chat = chat[0]
@@ -56,7 +55,7 @@ class ChatHandler():
         return chat
     
     async def patch(self, chat_uuid, data):
-        index_name = 'chat_uuid'
+        index_name = 'id'
         log.debug(data)
         await postgres.update(self.table_name, index_name, chat_uuid, data)
         log.info(f'PATCH {self.table_name} id {chat_uuid} with data {data}')
@@ -102,7 +101,7 @@ class UserChatHandler():
     async def get_chats_with_names(self, user_uuid):
         search_condintions = {'admin_panel_userchat.user_uuid_id': user_uuid}
         select_conditions = 'admin_panel_userchat.chat_uuid_id,admin_panel_userchat.user_uuid_id,admin_panel_chat.chat_name'
-        join_conditions = {'table': 'chat', 'cond': 'admin_panel_userchat.chat_uuid_id=admin_panelchat.chat_uuid'}
+        join_conditions = {'table': 'admin_panel_chat', 'cond': 'admin_panel_userchat.chat_uuid_id=admin_panel_chat.id'}
         chats = await postgres.select_join(select_conditions, self.table_name, search_condintions, join_conditions)
         if type(chats) != list:
             chats = []
@@ -115,7 +114,7 @@ class PacksHandler():
         self.table_name = 'admin_panel_packs'
 
     async def get(self, pack_uuid):
-        select_condintions = {'pack_uuid': pack_uuid}
+        select_condintions = {'id': pack_uuid}
         pack = await postgres.select(self.table_name, select_condintions)
         if type(pack) == list and len(pack) != 0:
             pack = pack[0]
@@ -130,7 +129,7 @@ class PacksHandler():
         return packs
 
     async def patch(self, pack_uuid, data):
-        index_name = 'pack_uuid'
+        index_name = 'id'
         await postgres.update(self.table_name, index_name, pack_uuid, data)
         log.info(f'PATCH {self.table_name} id {pack_uuid} with data {data}')
 

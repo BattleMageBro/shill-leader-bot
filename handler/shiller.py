@@ -26,7 +26,7 @@ async def shill_start(message: types.Message):
         end_timeout = chat.get('shill_end', 1) * 3600
         end_time = datetime.datetime.now().timestamp() + end_timeout
         shill_messages = ['3', '2', '1'].append(chat['shill_message'])
-        msg_timeout, shill_timeout = chat['msg_timeout'], chat['shill_timeout']
+        msg_timeout, shill_timeout = chat['msg_timeout'] or 1, chat['shill_timeout']
         if not chat['shill_links'] or not chat['shill_message']:
             raise ChatError(
                 user_message=ERRORS['start_shilling'],
