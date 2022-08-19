@@ -23,8 +23,23 @@ services:
     env_file:
       - ~/projects/shill-leader-bot/prod.env
     ports:
-      - "8000:8000"
+      - "8083:8083"
     depends_on: 
+      - pg_db
+
+  admin_panel:
+    build:
+      context: ~/projects/admin_panel/shill_admin_panel
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    env_file:
+      - ~/projects/shill-leader-bot/prod.env
+    depends_on:
       - pg_db
 
 volumes:

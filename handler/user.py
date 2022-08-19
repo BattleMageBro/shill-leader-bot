@@ -12,7 +12,7 @@ async def create_user_on_start(message:types.Message):
     try:
         await user_handler.get(user_uuid)
     except UserError:
-        data = {'user_uuid': user_uuid}
+        data = {'id': user_uuid}
         await user_handler.post(data)
         log.info(f'Create new user in database. UserId: {user_uuid}')
     await message.answer(MESSAGES['success_start'])

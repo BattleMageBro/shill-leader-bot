@@ -72,7 +72,7 @@ async def choose_packs(message:types.Message):
         packs = await packs_handler.get_all()
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         for item in packs:
-            keyboard.add(types.InlineKeyboardButton(text=item['pack_description'], callback_data=f'pack_{item["pack_uuid"]}'))
+            keyboard.add(types.InlineKeyboardButton(text=item['pack_description'], callback_data=f'pack_{item["id"]}'))
         keyboard.add(types.InlineKeyboardButton(text='back', callback_data='back_options'))
         await message.answer(MESSAGES['choose_packs'], reply_markup=keyboard)
     except Exception as exc:
