@@ -4,9 +4,9 @@ Python aiogram bot for shilling
 
 To start bot on your PC clone this repo
 
-
+```
 git clone https://github.com/BattleMageBro/shill-leader-bot.git
-
+```
 
 Then change variables in .env.exaple file and rename it to .env
 
