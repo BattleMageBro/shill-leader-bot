@@ -7,9 +7,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=shill
-      - POSTGRES_USER=shiller
-      - POSTGRES_DB=shill_db
+      - POSTGRES_PASSWORD=shill #change before starting
+      - POSTGRES_USER=shiller #change before starting
+      - POSTGRES_DB=shill_db #change before starting
     ports:
       - "5432:5432"
     expose:
@@ -17,30 +17,30 @@ services:
 
   bot:
     build:
-      context: ~/projects/shill-leader-bot
+      context: ~/projects/shill-leader-bot #change to path to shill leader bot
       dockerfile: Dockerfile
     image: result/latest
     env_file:
-      - ~/projects/shill-leader-bot/prod.env
+      - ~/projects/shill-leader-bot/prod.env #change to path to shill-leader-bot
     ports:
       - "8083:8083"
     depends_on: 
       - pg_db
 
-  admin_panel:
-    build:
-      context: ~/projects/admin_panel/shill_admin_panel
-      dockerfile: Dockerfile
-    command: >
-      sh -c "python manage.py makemigrations &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
-    ports:
-      - "8000:8000"
-    env_file:
-      - ~/projects/shill-leader-bot/prod.env
-    depends_on:
-      - pg_db
+#   admin_panel:
+#     build:
+#       context: ~/projects/admin_panel/shill_admin_panel
+#       dockerfile: Dockerfile
+#     command: >
+#       sh -c "python manage.py makemigrations &&
+#              python manage.py migrate &&
+#              python manage.py runserver 0.0.0.0:8000"
+#     ports:
+#       - "8000:8000"
+#     env_file:
+#       - ~/projects/shill-leader-bot/prod.env
+#     depends_on:
+#       - pg_db
 
 volumes:
   postgres-data:
